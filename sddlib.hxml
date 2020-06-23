@@ -1,0 +1,5 @@
+--class-path src
+--dce full
+--js bin/SDD.js
+-debug
+--main Main
