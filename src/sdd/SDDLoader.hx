@@ -5,6 +5,12 @@ import haxe.Exception;
 using Lambda;
 using sdd.XmlExtensions;
 
+@:structInit
+class TaxonHierarchy {
+    public var taxon: Taxon;
+    public var childrenHierarchyIds: Array<String>;
+}
+
 class SDDLoader {
     public function new() {}
 
@@ -113,6 +119,55 @@ class SDDLoader {
                             states.push(referencedState.copy());
                         }
                     }
+                }
+            }
+        }
+
+        final taxonHierarchiesElement = datasetElement.firstElementNamed("TaxonHierarchies");
+        final taxonHierarchyElement = if (taxonHierarchiesElement != null) { taxonHierarchiesElement.firstElementNamed("TaxonHierarchy"); } else { null; }
+        final nodesElement = if (taxonHierarchyElement != null) { taxonHierarchyElement.firstElementNamed("Nodes"); } else { null; }
+        
+        if (nodesElement != null) {
+            final hierarchiesById: Map<String, TaxonHierarchy> = [];
+
+            for (nodeElement in nodesElement.elementsNamed("Node")) {
+                final hierarchyId = assertNotNull(nodeElement.get("id"),
+                    "Invalid SDD: a TaxonHierarchy > Nodes > Node is missing its 'id'.");
+                final taxonNameElement = assertNotNull(nodeElement.firstElementNamed("TaxonName"),
+                    "Invalid SDD: a TaxonHierarchy > Nodes > Node is missing its 'TaxonName'.");
+                final taxonId = assertNotNull(taxonNameElement.get("ref"),
+                    "Invalid SDD: a TaxonHierarchy > Nodes > Node > TaxonName is missing its 'ref'.");
+                final taxon = assertNotNull(taxonsById.get(taxonId),
+                    "Invalid SDD: a TaxonHierarchy > Nodes > Node > TaxonName is referencing a missing Taxons: " + taxonId);
+                var hierarchy = hierarchiesById.get(hierarchyId);
+                
+                if (hierarchy == null) {
+                    hierarchy = { taxon:  taxon, childrenHierarchyIds: [] };
+                } else {
+                    hierarchy.taxon = taxon;
+                }
+                hierarchiesById.set(hierarchyId, hierarchy);
+
+                final parentElement = nodeElement.firstElementNamed("Parent");
+
+                if (parentElement != null) {
+                    final parentId = assertNotNull(parentElement.get("ref"),
+                        "Invalid SDD: a TaxonHierarchy >> Parent is missing its 'ref'.");
+                    var parent = hierarchiesById.get(parentId);
+                    if (parent == null) {
+                        parent = { taxon: null, childrenHierarchyIds: [hierarchyId] };
+                        hierarchiesById.set(parentId, parent);
+                    } else {
+                        parent.childrenHierarchyIds.push(hierarchyId);
+                    }
+                }
+            }
+            for (hierarchy in hierarchiesById) {
+                final augmentedTaxon = hierarchy.taxon;
+
+                for (hid in hierarchy.childrenHierarchyIds) {
+                    final child = hierarchiesById.get(hid).taxon;
+                    augmentedTaxon.children.push(child);
                 }
             }
         }
