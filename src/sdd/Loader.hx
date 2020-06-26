@@ -11,7 +11,9 @@ class TaxonHierarchy {
     public var childrenHierarchyIds: Array<String>;
 }
 
-class SDDLoader {
+@:keep
+@:expose
+class Loader {
     public function new() {}
 
     function loadDataset(datasetElement: Xml): Dataset {
@@ -244,13 +246,15 @@ class SDDLoader {
         return charactersById;
     }
 
-    public function load(text: String) {
-        var xml = Xml.parse(text);
-        var datasetsElements = xml.firstElement();
+    public function load(text: String): Array<Dataset> {
+        final xml = Xml.parse(text);
+        final datasetsElements = xml.firstElement();
+        final datasets = [];
 
         for (datasetElement in datasetsElements) {
-            var dataset = loadDataset(datasetElement);
-            trace(dataset);
+            datasets.push(loadDataset(datasetElement));
         }
+
+        return datasets;
     }
 }

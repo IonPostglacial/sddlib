@@ -2,4 +2,4 @@
 --dce full
 --js bin/SDD.js
 -debug
---main Main
+sdd.Loader
