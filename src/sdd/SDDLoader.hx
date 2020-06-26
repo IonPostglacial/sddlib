@@ -178,10 +178,14 @@ class SDDLoader {
     function loadDatasetCharacters(datasetElement: Xml, mediaObjectsById: Map<String, MediaObject>): Map<String, Character> {
         final charactersById: Map<String, Character> = [];
         final charactersElements = datasetElement.firstElementNamed("Characters");
+        final statesById: Map<String, State> = [];
 
         if (charactersElements == null) return charactersById;
 
-        for (characterElement in charactersElements.elementsNamed("CategoricalCharacter")) {
+        for (characterElement in charactersElements.elements()) {
+            if (characterElement.nodeName != "CategoricalCharacter" && characterElement.nodeName != "QuantitativeCharacter") {
+                continue;
+            }
             final characterId = assertNotNull(characterElement.get("id"), "Invalid SDD: a Character is missing its 'id'.");
 
             final statesElement = characterElement.firstElementNamed("States");
@@ -191,12 +195,51 @@ class SDDLoader {
             if (statesElement != null) {
                 for (stateElement in statesElement.elementsNamed("StateDefinition")) {
                     final stateId = assertNotNull(stateElement.get("id"), "Invalid SDD: a State is missing its 'id'");
-
-                    states.push(new State(stateId, loadRepresentation(stateElement.firstElementNamed("Representation"), mediaObjectsById)));
+                    final state = new State(stateId, characterId, loadRepresentation(stateElement.firstElementNamed("Representation"), mediaObjectsById));
+                    statesById.set(stateId, state);
+                    states.push(state);
                 }
             }
 
             charactersById.set(characterId, new Character(characterId, loadRepresentation(characterElement.firstElementNamed("Representation"), mediaObjectsById), states));
+
+            final characterTreesElement = datasetElement.firstElementNamed("CharacterTrees");
+
+            if (characterTreesElement != null) {
+                for (characterTreeElement in characterTreesElement.elementsNamed("CharacterTrees")) {
+                    final nodesElement = characterTreeElement.firstElementNamed("Nodes");
+
+                    if (nodesElement != null) {
+                        for (charNodeElement in nodesElement.elementsNamed("CharNode")) {
+                            final characterElement = assertNotNull(charNodeElement.firstElementNamed("Character"),
+                                "Invalid SDD: a CharNode is missing its 'Character'.");
+                            final characterRef = assertNotNull(characterElement.get("ref"),
+                                "Invalid SDD: a CharNode > Character is missing its 'ref.");
+                            final augmentedCharacter = assertNotNull(charactersById.get(characterRef),
+                                "Invalid SDD: a CharNode > Character references a missing Character: " + characterRef);
+                            final dependencyRulesElement = charNodeElement.firstElementNamed("DependencyRules");
+
+                            if (dependencyRulesElement != null) {
+                                final inapplicableIfElement = dependencyRulesElement.firstElementNamed("InapplicableIf");
+
+                                if (inapplicableIfElement != null) {
+                                    for (stateElement in inapplicableIfElement.elementsNamed("State")) {
+                                        final stateRef = assertNotNull(stateElement.get("ref"),
+                                            "Invalid SDD: an InapplicableIf > State is missing its 'ref'.");
+                                        final state = assertNotNull(statesById.get(stateRef),
+                                            "Invalid SDD: an InapplicableIf > State references a missing State: " + stateRef);
+                                        augmentedCharacter.inapplicableStates.push(state);
+                                        augmentedCharacter.parentId = state.characterId;
+                                    }
+                                }
+                            }
+                            if (augmentedCharacter.inapplicableStates.length > 0) {
+                                charactersById.get(augmentedCharacter.parentId).children.push(augmentedCharacter);
+                            }
+                        }
+                    }
+                }
+            }
         }
         return charactersById;
     }

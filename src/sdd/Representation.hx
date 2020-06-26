@@ -4,7 +4,7 @@ package sdd;
 class Representation {
     public var label: String;
     public var detail: String;
-    public var mediaObjects: Array<MediaObject>;
+    public var mediaObjects: Array<MediaObject> = [];
 
     static inline function nullOrEmpty(s: String) return s == null || s == "";
 
