@@ -69,8 +69,8 @@ class Loader {
         };
     }
 
-    static inline function assertNotNull<T>(value: Null<T>, errorMessage: String): T {
-        if (value == null) throw new Exception(errorMessage);
+    static inline function assertNotNull<T>(value: Null<T>, exception: Exception): T {
+        if (value == null) throw exception;
         return value;
     }
 
@@ -81,7 +81,7 @@ class Loader {
         if (taxonNamesElement == null) return taxonsById;
 
         for (taxonElement in taxonNamesElement.elementsNamed("TaxonName")) {
-            final taxonId = assertNotNull(taxonElement.get("id"), "Invalid SDD: a Taxon is missing its 'id'.");
+            final taxonId = assertNotNull(taxonElement.get("id"), new SddException("A Taxon is missing its 'id'."));
 
             taxonsById.set(taxonId, new Taxon(taxonId, loadRepresentation(taxonElement.firstElementNamed("Representation"), mediaObjectsById)));
         }
@@ -91,14 +91,14 @@ class Loader {
         if (codedDescriptionsElement != null) {
             for (codedDescriptionElement in codedDescriptionsElement.elementsNamed("CodedDescription")) {
                 final scopeElement = assertNotNull(codedDescriptionElement.firstElementNamed("Scope"),
-                    "Invalid SDD: a CodedDescription is missing its 'Scope'.");
+                    new SddException("A CodedDescription is missing its 'Scope'."));
                 final taxonNameElement = assertNotNull(scopeElement.firstElementNamed("TaxonName"), 
-                    "A CodedDescription Scope doesn't have a 'Taxon' element, which is the only one supported by this loader.");
+                    new SddException("A CodedDescription Scope doesn't have a 'Taxon' element, which is the only one supported by this loader."));
                 final taxonId = assertNotNull(taxonNameElement.get("ref"),
-                    "Invalid SDD: a TaxonName is missing its 'ref'.");
+                    new SddException("A TaxonName is missing its 'ref'."));
                 final representation = loadRepresentation(codedDescriptionElement.firstElementNamed("Representation"), mediaObjectsById);
                 final taxonToAugment = assertNotNull(taxonsById.get(taxonId),
-                    "Scope > TaxonName references a missing Taxon: " + taxonId);
+                    new SddRefException("Scope > TaxonName", "Taxon", taxonId));
                 Representation.assign(taxonToAugment, representation);
 
                 final summaryDataElement = codedDescriptionElement.firstElementNamed("SummaryData");
@@ -108,16 +108,16 @@ class Loader {
 
                     for (categoricalElement in categoricalElements) {
                         final characterId = assertNotNull(categoricalElement.get("ref"),
-                            "Invalid SDD: a Categorical is missing its 'ref' attribute.");
+                            new SddException("A Categorical is missing its 'ref' attribute."));
                         final referencedCharacter = assertNotNull(charactersById.get(characterId),
-                            "Invalid SDD: Categorical references a missing Character: " + characterId);
+                            new SddRefException("Categorical", "Character", characterId));
                         final states = [];
                         taxonToAugment.statesByCharacterId.set(characterId, states);
                         for (stateElement in categoricalElement.elementsNamed("State")) {
                             final stateId = assertNotNull(stateElement.get("ref"),
-                                "Invalid SDD: a State is missing its 'ref'.");
+                                new SddException("A State is missing its 'ref'."));
                             final referencedState = assertNotNull(referencedCharacter.states.find(s -> s.id == stateId),
-                                "Categorical > State references a missing State: " + stateId);
+                                new SddRefException("Categorical > State", "State", stateId));
                             states.push(referencedState.copy());
                         }
                     }
@@ -134,13 +134,13 @@ class Loader {
 
             for (nodeElement in nodesElement.elementsNamed("Node")) {
                 final hierarchyId = assertNotNull(nodeElement.get("id"),
-                    "Invalid SDD: a TaxonHierarchy > Nodes > Node is missing its 'id'.");
+                    new SddException("A TaxonHierarchy > Nodes > Node is missing its 'id'."));
                 final taxonNameElement = assertNotNull(nodeElement.firstElementNamed("TaxonName"),
-                    "Invalid SDD: a TaxonHierarchy > Nodes > Node is missing its 'TaxonName'.");
+                new SddException("A TaxonHierarchy > Nodes > Node is missing its 'TaxonName'."));
                 final taxonId = assertNotNull(taxonNameElement.get("ref"),
-                    "Invalid SDD: a TaxonHierarchy > Nodes > Node > TaxonName is missing its 'ref'.");
+                    new SddException("A TaxonHierarchy > Nodes > Node > TaxonName is missing its 'ref'."));
                 final taxon = assertNotNull(taxonsById.get(taxonId),
-                    "Invalid SDD: a TaxonHierarchy > Nodes > Node > TaxonName is referencing a missing Taxons: " + taxonId);
+                    new SddRefException("TaxonHierarchy > Nodes > Node > TaxonName", "Taxons", taxonId));
                 var hierarchy = hierarchiesById.get(hierarchyId);
                 
                 if (hierarchy == null) {
@@ -154,7 +154,7 @@ class Loader {
 
                 if (parentElement != null) {
                     final parentId = assertNotNull(parentElement.get("ref"),
-                        "Invalid SDD: a TaxonHierarchy >> Parent is missing its 'ref'.");
+                        new SddException("A TaxonHierarchy >> Parent is missing its 'ref'."));
                     var parent = hierarchiesById.get(parentId);
                     if (parent == null) {
                         parent = { taxon: null, childrenHierarchyIds: [hierarchyId] };
@@ -188,7 +188,7 @@ class Loader {
             if (characterElement.nodeName != "CategoricalCharacter" && characterElement.nodeName != "QuantitativeCharacter") {
                 continue;
             }
-            final characterId = assertNotNull(characterElement.get("id"), "Invalid SDD: a Character is missing its 'id'.");
+            final characterId = assertNotNull(characterElement.get("id"), new SddException("A Character is missing its 'id'."));
 
             final statesElement = characterElement.firstElementNamed("States");
 
@@ -196,7 +196,7 @@ class Loader {
 
             if (statesElement != null) {
                 for (stateElement in statesElement.elementsNamed("StateDefinition")) {
-                    final stateId = assertNotNull(stateElement.get("id"), "Invalid SDD: a State is missing its 'id'");
+                    final stateId = assertNotNull(stateElement.get("id"), new SddException("A State is missing its 'id'"));
                     final state = new State(stateId, characterId, loadRepresentation(stateElement.firstElementNamed("Representation"), mediaObjectsById));
                     statesById.set(stateId, state);
                     states.push(state);
@@ -214,11 +214,11 @@ class Loader {
                     if (nodesElement != null) {
                         for (charNodeElement in nodesElement.elementsNamed("CharNode")) {
                             final characterElement = assertNotNull(charNodeElement.firstElementNamed("Character"),
-                                "Invalid SDD: a CharNode is missing its 'Character'.");
+                                new SddException("A CharNode is missing its 'Character'."));
                             final characterRef = assertNotNull(characterElement.get("ref"),
-                                "Invalid SDD: a CharNode > Character is missing its 'ref.");
+                                new SddException("A CharNode > Character is missing its 'ref."));
                             final augmentedCharacter = assertNotNull(charactersById.get(characterRef),
-                                "Invalid SDD: a CharNode > Character references a missing Character: " + characterRef);
+                                new SddRefException("CharNode > Character", "Character", characterRef));
                             final dependencyRulesElement = charNodeElement.firstElementNamed("DependencyRules");
 
                             if (dependencyRulesElement != null) {
@@ -227,9 +227,9 @@ class Loader {
                                 if (inapplicableIfElement != null) {
                                     for (stateElement in inapplicableIfElement.elementsNamed("State")) {
                                         final stateRef = assertNotNull(stateElement.get("ref"),
-                                            "Invalid SDD: an InapplicableIf > State is missing its 'ref'.");
+                                            new SddException("A InapplicableIf > State is missing its 'ref'."));
                                         final state = assertNotNull(statesById.get(stateRef),
-                                            "Invalid SDD: an InapplicableIf > State references a missing State: " + stateRef);
+                                            new SddRefException("InapplicableIf > State", "State", stateRef));
                                         augmentedCharacter.inapplicableStates.push(state);
                                         augmentedCharacter.parentId = state.characterId;
                                     }
