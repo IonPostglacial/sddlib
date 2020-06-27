@@ -2,7 +2,7 @@ package sdd;
 
 @:structInit
 class Representation {
-    public var label: String;
+    public var name: String;
     public var detail: String;
     public var mediaObjects: Array<MediaObject> = [];
 
@@ -11,8 +11,8 @@ class Representation {
     public static inline function assign(r1: Representation, r2: Null<Representation>) {
         if (r2 == null) return;
 
-        if (!nullOrEmpty(r2.label)) {
-            r1.label = r2.label;
+        if (!nullOrEmpty(r2.name)) {
+            r1.name = r2.name;
         }
         if (!nullOrEmpty(r2.detail)) {
             r1.detail = r2.detail;
