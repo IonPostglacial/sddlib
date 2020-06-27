@@ -111,14 +111,12 @@ class Loader {
                             new SddException("A Categorical is missing its 'ref' attribute."));
                         final referencedCharacter = assertNotNull(charactersById.get(characterId),
                             new SddRefException("Categorical", "Character", characterId));
-                        final states = [];
-                        taxonToAugment.statesByCharacterId.set(characterId, states);
                         for (stateElement in categoricalElement.elementsNamed("State")) {
                             final stateId = assertNotNull(stateElement.get("ref"),
                                 new SddException("A State is missing its 'ref'."));
                             final referencedState = assertNotNull(referencedCharacter.states.find(s -> s.id == stateId),
                                 new SddRefException("Categorical > State", "State", stateId));
-                            states.push(referencedState.copy());
+                            taxonToAugment.selectedStates.push(referencedState.copy());
                         }
                     }
                 }
@@ -169,6 +167,7 @@ class Loader {
 
                 for (hid in hierarchy.childrenHierarchyIds) {
                     final child = hierarchiesById.get(hid).taxon;
+                    child.parentId = augmentedTaxon.id;
                     augmentedTaxon.children.push(child);
                 }
             }
@@ -204,40 +203,39 @@ class Loader {
             }
 
             charactersById.set(characterId, new Character(characterId, loadRepresentation(characterElement.firstElementNamed("Representation"), mediaObjectsById), states));
+        }
+        final characterTreesElement = datasetElement.firstElementNamed("CharacterTrees");
 
-            final characterTreesElement = datasetElement.firstElementNamed("CharacterTrees");
+        if (characterTreesElement != null) {
+            for (characterTreeElement in characterTreesElement.elementsNamed("CharacterTree")) {
+                final nodesElement = characterTreeElement.firstElementNamed("Nodes");
 
-            if (characterTreesElement != null) {
-                for (characterTreeElement in characterTreesElement.elementsNamed("CharacterTrees")) {
-                    final nodesElement = characterTreeElement.firstElementNamed("Nodes");
+                if (nodesElement != null) {
+                    for (charNodeElement in nodesElement.elementsNamed("CharNode")) {
+                        final characterElement = assertNotNull(charNodeElement.firstElementNamed("Character"),
+                            new SddException("A CharNode is missing its 'Character'."));
+                        final characterRef = assertNotNull(characterElement.get("ref"),
+                            new SddException("A CharNode > Character is missing its 'ref."));
+                        final augmentedCharacter = assertNotNull(charactersById.get(characterRef),
+                            new SddRefException("CharNode > Character", "Character", characterRef));
+                        final dependencyRulesElement = charNodeElement.firstElementNamed("DependencyRules");
 
-                    if (nodesElement != null) {
-                        for (charNodeElement in nodesElement.elementsNamed("CharNode")) {
-                            final characterElement = assertNotNull(charNodeElement.firstElementNamed("Character"),
-                                new SddException("A CharNode is missing its 'Character'."));
-                            final characterRef = assertNotNull(characterElement.get("ref"),
-                                new SddException("A CharNode > Character is missing its 'ref."));
-                            final augmentedCharacter = assertNotNull(charactersById.get(characterRef),
-                                new SddRefException("CharNode > Character", "Character", characterRef));
-                            final dependencyRulesElement = charNodeElement.firstElementNamed("DependencyRules");
+                        if (dependencyRulesElement != null) {
+                            final inapplicableIfElement = dependencyRulesElement.firstElementNamed("InapplicableIf");
 
-                            if (dependencyRulesElement != null) {
-                                final inapplicableIfElement = dependencyRulesElement.firstElementNamed("InapplicableIf");
-
-                                if (inapplicableIfElement != null) {
-                                    for (stateElement in inapplicableIfElement.elementsNamed("State")) {
-                                        final stateRef = assertNotNull(stateElement.get("ref"),
-                                            new SddException("A InapplicableIf > State is missing its 'ref'."));
-                                        final state = assertNotNull(statesById.get(stateRef),
-                                            new SddRefException("InapplicableIf > State", "State", stateRef));
-                                        augmentedCharacter.inapplicableStates.push(state);
-                                        augmentedCharacter.parentId = state.characterId;
-                                    }
+                            if (inapplicableIfElement != null) {
+                                for (stateElement in inapplicableIfElement.elementsNamed("State")) {
+                                    final stateRef = assertNotNull(stateElement.get("ref"),
+                                        new SddException("A InapplicableIf > State is missing its 'ref'."));
+                                    final state = assertNotNull(statesById.get(stateRef),
+                                        new SddRefException("InapplicableIf > State", "State", stateRef));
+                                    augmentedCharacter.inapplicableStates.push(state);
+                                    augmentedCharacter.parentId = state.characterId;
                                 }
                             }
-                            if (augmentedCharacter.inapplicableStates.length > 0) {
-                                charactersById.get(augmentedCharacter.parentId).children.push(augmentedCharacter);
-                            }
+                        }
+                        if (augmentedCharacter.inapplicableStates.length > 0) {
+                            charactersById.get(augmentedCharacter.parentId).children.push(augmentedCharacter);
                         }
                     }
                 }
