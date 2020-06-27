@@ -21,8 +21,8 @@ class Loader {
         final charactersById = loadDatasetCharacters(datasetElement, mediaObjectsById);
 
         return {
-            taxonsById: loadDatasetTaxons(datasetElement, mediaObjectsById, charactersById),
-            charactersById: charactersById
+            taxons: loadDatasetTaxons(datasetElement, mediaObjectsById, charactersById).array(),
+            characters: charactersById.array()
         };
     }
 
@@ -78,7 +78,7 @@ class Loader {
         final taxonsById: Map<String, Taxon> = [];
         final taxonNamesElement = datasetElement.firstElementNamed("TaxonNames");
 
-        if (taxonNamesElement == null) return taxonsById;
+        if (taxonNamesElement == null) return [];
 
         for (taxonElement in taxonNamesElement.elementsNamed("TaxonName")) {
             final taxonId = assertNotNull(taxonElement.get("id"), new SddException("A Taxon is missing its 'id'."));
