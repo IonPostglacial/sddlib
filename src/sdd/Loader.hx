@@ -114,16 +114,10 @@ class Loader {
                     final categoricalElements = summaryDataElement.elementsNamed("Categorical");
 
                     for (categoricalElement in categoricalElements) {
-                        final characterId = assertNotNull(categoricalElement.get("ref"),
-                            new SddException("A Categorical is missing its 'ref' attribute."));
-                        final referencedCharacter = assertNotNull(charactersById.get(characterId),
-                            new SddRefException("Categorical", "Character", characterId));
                         for (stateElement in categoricalElement.elementsNamed("State")) {
                             final stateId = assertNotNull(stateElement.get("ref"),
                                 new SddException("A State is missing its 'ref'."));
-                            final referencedState = assertNotNull(referencedCharacter.states.find(s -> s.id == stateId),
-                                new SddRefException("Categorical > State", "State", stateId));
-                            taxonToAugment.selectedStatesIds.push(referencedState.id);
+                            taxonToAugment.selectedStatesIds.push(stateId);
                         }
                     }
                 }
@@ -198,18 +192,18 @@ class Loader {
 
             final statesElement = characterElement.firstElementNamed("States");
 
-            final states = [];
+            final statesIds = [];
 
             if (statesElement != null) {
                 for (stateElement in statesElement.elementsNamed("StateDefinition")) {
                     final stateId = assertNotNull(stateElement.get("id"), new SddException("A State is missing its 'id'"));
                     final state = new State(stateId, characterId, loadRepresentation(stateElement.firstElementNamed("Representation"), mediaObjectsById));
                     statesById.set(stateId, state);
-                    states.push(state);
+                    statesIds.push(stateId);
                 }
             }
 
-            charactersById.set(characterId, new Character(characterId, loadRepresentation(characterElement.firstElementNamed("Representation"), mediaObjectsById), states));
+            charactersById.set(characterId, new Character(characterId, loadRepresentation(characterElement.firstElementNamed("Representation"), mediaObjectsById), statesIds));
         }
         final characterTreesElement = datasetElement.firstElementNamed("CharacterTrees");
 
