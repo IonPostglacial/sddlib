@@ -48,7 +48,7 @@ class Loader {
 
                 if (id == null) throw new Exception("Invalid SDD: a MediaObject declaration misses its 'id'.");
 
-                mediaObjectsById.set(mediaObjectElement.get("id"), { source: sourceElement.get("href"), detail: representation.detail });
+                mediaObjectsById.set(mediaObjectElement.get("id"), { source: sourceElement.get("href"), label: representation.label, detail: representation.detail });
             }
         }
 
@@ -141,6 +141,8 @@ class Loader {
                 final taxon = assertNotNull(taxonsById.get(taxonId),
                     new SddRefException("TaxonHierarchy > Nodes > Node > TaxonName", "Taxons", taxonId));
                 var hierarchy = hierarchiesById.get(hierarchyId);
+
+                taxon.hid = hierarchyId;
                 
                 if (hierarchy == null) {
                     hierarchy = { taxon:  taxon, childrenHierarchyIds: [] };
