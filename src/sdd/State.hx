@@ -11,6 +11,6 @@ class State extends Representation {
     }
 
     public function copy(): State {
-        return new State(this.id, this.characterId, { name: this.name, detail: this.detail, mediaObjects: this.mediaObjects });
+        return new State(this.id, this.characterId, { label: this.label, detail: this.detail, mediaObjects: this.mediaObjects });
     }
 }

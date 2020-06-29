@@ -49,7 +49,7 @@ class Loader {
     }
 
     function loadRepresentation(representationElement: Xml, mediaObjectsByRef: Map<String, MediaObject>): Representation {
-        if (representationElement == null) return { mediaObjects: [], name: "", detail: "" };
+        if (representationElement == null) return { mediaObjects: [], label: "", detail: "" };
 
         final mediaObjects = [];
 
@@ -63,7 +63,7 @@ class Loader {
         final detailElement = representationElement.firstElementNamed("Detail");
 
         return {
-            name: if (labelNode != null) { labelNode.innerText(); } else { "_"; },
+            label: if (labelNode != null) { labelNode.innerText(); } else { "_"; },
             detail: if (detailElement != null) { detailElement.innerText(); } else { "_"; },
             mediaObjects: mediaObjects
         };
