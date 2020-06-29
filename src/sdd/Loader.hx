@@ -11,6 +11,12 @@ class TaxonHierarchy {
     public var childrenHierarchyIds: Array<String>;
 }
 
+@:structInit
+class CharactersAndStatesById {
+    public var charactersById: Map<String, Character>;
+    public var statesById: Map<String, State>;
+}
+
 @:keep
 @:expose
 class Loader {
@@ -18,11 +24,12 @@ class Loader {
 
     function loadDataset(datasetElement: Xml): Dataset {
         final mediaObjectsById = loadMediaObjects(datasetElement);
-        final charactersById = loadDatasetCharacters(datasetElement, mediaObjectsById);
+        final charsAndStatesById = loadDatasetCharacters(datasetElement, mediaObjectsById);
 
         return {
-            taxons: loadDatasetTaxons(datasetElement, mediaObjectsById, charactersById).array(),
-            characters: charactersById.array()
+            taxons: loadDatasetTaxons(datasetElement, mediaObjectsById, charsAndStatesById.charactersById).array(),
+            characters: charsAndStatesById.charactersById.array(),
+            states: charsAndStatesById.statesById.array()
         };
     }
 
@@ -116,7 +123,7 @@ class Loader {
                                 new SddException("A State is missing its 'ref'."));
                             final referencedState = assertNotNull(referencedCharacter.states.find(s -> s.id == stateId),
                                 new SddRefException("Categorical > State", "State", stateId));
-                            taxonToAugment.selectedStates.push(referencedState.copy());
+                            taxonToAugment.selectedStatesIds.push(referencedState.id);
                         }
                     }
                 }
@@ -176,12 +183,12 @@ class Loader {
         return taxonsById;
     }
 
-    function loadDatasetCharacters(datasetElement: Xml, mediaObjectsById: Map<String, MediaObject>): Map<String, Character> {
+    function loadDatasetCharacters(datasetElement: Xml, mediaObjectsById: Map<String, MediaObject>): CharactersAndStatesById {
         final charactersById: Map<String, Character> = [];
         final charactersElements = datasetElement.firstElementNamed("Characters");
         final statesById: Map<String, State> = [];
 
-        if (charactersElements == null) return charactersById;
+        if (charactersElements == null) return { charactersById: charactersById, statesById: statesById };
 
         for (characterElement in charactersElements.elements()) {
             if (characterElement.nodeName != "CategoricalCharacter" && characterElement.nodeName != "QuantitativeCharacter") {
@@ -229,19 +236,19 @@ class Loader {
                                         new SddException("A InapplicableIf > State is missing its 'ref'."));
                                     final state = assertNotNull(statesById.get(stateRef),
                                         new SddRefException("InapplicableIf > State", "State", stateRef));
-                                    augmentedCharacter.inapplicableStates.push(state);
+                                    augmentedCharacter.inapplicableStatesIds.push(state.id);
                                     augmentedCharacter.parentId = state.characterId;
                                 }
                             }
                         }
-                        if (augmentedCharacter.inapplicableStates.length > 0) {
+                        if (augmentedCharacter.inapplicableStatesIds.length > 0) {
                             charactersById.get(augmentedCharacter.parentId).children.push(augmentedCharacter);
                         }
                     }
                 }
             }
         }
-        return charactersById;
+        return { charactersById: charactersById, statesById: statesById };
     }
 
     public function load(text: String): Array<Dataset> {

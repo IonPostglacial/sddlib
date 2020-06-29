@@ -3,7 +3,7 @@ package sdd;
 class Taxon extends Representation {
     public var id: String;
     public var parentId: Null<String>;
-    public var selectedStates: Array<State> = [];
+    public var selectedStatesIds: Array<String> = [];
     public var children: Array<Taxon> = [];
 
     public function new(id: String, representation: Representation) {

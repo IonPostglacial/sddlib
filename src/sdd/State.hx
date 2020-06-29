@@ -9,8 +9,4 @@ class State extends Representation {
         this.characterId = characterId;
         Representation.assign(this, representation);
     }
-
-    public function copy(): State {
-        return new State(this.id, this.characterId, { label: this.label, detail: this.detail, mediaObjects: this.mediaObjects });
-    }
 }
