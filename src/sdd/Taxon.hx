@@ -2,6 +2,7 @@ package sdd;
 
 class Taxon extends Representation {
     public var id: String;
+    public var hid: String;
     public var parentId: Null<String>;
     public var selectedStatesIds: Array<String> = [];
     public var childrenIds: Array<String> = [];
