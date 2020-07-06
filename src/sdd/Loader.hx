@@ -169,7 +169,7 @@ class Loader {
                 for (hid in hierarchy.childrenHierarchyIds) {
                     final child = hierarchiesById.get(hid).taxon;
                     child.parentId = augmentedTaxon.id;
-                    augmentedTaxon.children.push(child);
+                    augmentedTaxon.childrenIds.push(child.id);
                 }
             }
         }
@@ -236,7 +236,7 @@ class Loader {
                             }
                         }
                         if (augmentedCharacter.inapplicableStatesIds.length > 0) {
-                            charactersById.get(augmentedCharacter.parentId).children.push(augmentedCharacter);
+                            charactersById.get(augmentedCharacter.parentId).childrenIds.push(augmentedCharacter.id);
                         }
                     }
                 }
