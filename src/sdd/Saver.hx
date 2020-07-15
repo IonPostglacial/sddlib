@@ -1,5 +1,7 @@
 package sdd;
 
+@:keep
+@:expose
 class Saver {
 	public var datasets:Array<Dataset>;
 	public var mediaObjectsCount = 0;

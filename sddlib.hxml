@@ -2,7 +2,8 @@
 --dce full
 --js bin/SDD.js
 --resource res/sdd.mtt@sdd_template
---resource res/test.sdd.xml@sdd_sample
+# --resource res/test.sdd.xml@sdd_sample
+# --resource res/missing-ref.sdd.xml@sdd_missref
 -debug
-# sdd.Loader
---main Main
+sdd.Loader
+sdd.Saver
