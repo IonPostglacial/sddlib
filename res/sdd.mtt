@@ -14,15 +14,8 @@
                 <Representation>
                     <Label>::label::</Label>
                     <Detail>::detail::</Detail>
-                    ::foreach mediaObjects::
-                    <MediaObject id="::id::">
-                        <Source href="::source::" />
-                        <Type>Image</Type>
-                        <Representation>
-                            <Label>::label::</Label>
-                            <Detail role="Caption">::detail::</Detail>
-                        </Representation>
-                    </MediaObject>
+                    ::foreach mediaObjectsRefs::
+                    <MediaObject ref="::ref::" />
                     ::end::
                 </Representation>
             </TaxonName>
@@ -50,15 +43,8 @@
                 <Representation>
                     <Label>::label::</Label>
                     <Detail>::detail::</Detail>
-                    ::foreach mediaObjects::
-                    <MediaObject id="::id::">
-                        <Source href="::source::" />
-                        <Type>Image</Type>
-                        <Representation>
-                            <Label>::label::</Label>
-                            <Detail role="Caption">::detail::</Detail>
-                        </Representation>
-                    </MediaObject>
+                    ::foreach mediaObjectsRefs::
+                    <MediaObject ref="::ref::" />
                     ::end::
                 </Representation>
                 ::if(states.length > 0)::
@@ -68,15 +54,8 @@
                             <Representation>
                                 <Label>::label::</Label>
                                 <Detail>::detail::</Detail>
-                                ::foreach mediaObjects::
-                                <MediaObject id="::id::">
-                                    <Source href="::source::" />
-                                    <Type>Image</Type>
-                                    <Representation>
-                                        <Label>::label::</Label>
-                                        <Detail role="Caption">::detail::</Detail>
-                                    </Representation>
-                                </MediaObject>
+                                ::foreach mediaObjectsRefs::
+                                <MediaObject ref="::ref::" />
                                 ::end::
                             </Representation>
                         </StateDefinition>
@@ -86,9 +65,69 @@
             </CategoricalCharacter>
         ::end::
         </Characters>
-        <CharacterTrees></CharacterTrees>
-        <CodedDescriptions></CodedDescriptions>
-        <MediaObjects></MediaObjects>
+        <CharacterTrees>
+            <CharacterTree id="ct1">
+                <Representation>
+                    <Label>Ordre et dependance entre caracteres</Label>
+                </Representation>
+                <ShouldContainAllCharacters>true</ShouldContainAllCharacters>
+                <Nodes>
+                ::foreach characters::
+                    <CharNode>
+                        ::if (inapplicableStatesIds.length > 0)::
+                        <DependencyRules>
+							<InapplicableIf>
+                            ::foreach inapplicableStatesIds::
+								<State ref="::ref::" />
+                            ::end::
+							</InapplicableIf>
+						</DependencyRules>
+                        ::end::
+                        <Character ref="::id::" />
+                    </CharNode>
+                ::end::
+                </Nodes>
+            </CharacterTree>
+        </CharacterTrees>
+        <CodedDescriptions>
+        ::foreach taxons::
+            <CodedDescription id="D1">
+                <Representation>
+                    <Label>::label::</Label>
+                    <Detail>::detail::</Detail>
+                    ::foreach mediaObjectsRefs::
+                    <MediaObject ref="::ref::" />
+                    ::end::
+                </Representation>
+                <Scope>
+                    <TaxonName ref="::id::" />
+                </Scope>
+                ::if (categoricals.length > 0)::
+                <SummaryData>
+                ::foreach categoricals::
+                    <Categorical ref="::ref::">
+                    ::foreach stateRefs::
+                        <State ref="::ref::" />
+                    ::end::
+                    </Categorical>
+                ::end::
+                </SummaryData>
+                ::end::
+            </CodedDescription>
+        ::end::
+        </CodedDescriptions>
+        <MediaObjects>
+        ::foreach mediaObjects::
+            <MediaObject id="::id::">
+                <Representation>
+                    <Label>::label::</Label>
+                    <Detail role="Caption">::detail::</Detail>
+                </Representation>
+                <Type>Image</Type>
+                <Source href="::source::" />
+            </MediaObject>
+        ::end::
+        </MediaObjects>
     </Dataset>
     ::end::
 </Datasets>

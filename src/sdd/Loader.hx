@@ -33,7 +33,8 @@ class Loader {
 		return {
 			taxons: loadDatasetTaxons(datasetElement, mediaObjectsById, charsAndStatesById.charactersById).array(),
 			characters: charsAndStatesById.charactersById.array(),
-			states: charsAndStatesById.statesById.array()
+			states: charsAndStatesById.statesById.array(),
+			mediaObjects: mediaObjectsById.array(),
 		};
 	}
 
@@ -60,15 +61,15 @@ class Loader {
 
 	function loadRepresentation(representationElement:Xml, mediaObjectsByRef:Map<String, MediaObject>):Representation {
 		if (representationElement == null)
-			return {mediaObjects: [], label: "", detail: ""};
-
-		final mediaObjects = [];
+			return {
+				mediaObjectsRefs: [],
+				label: "",
+				detail: "",
+			};
+		final mediaObjectsRefs = [];
 
 		for (mediaObjectElement in representationElement.elementsNamed("MediaObject")) {
-			final mediaObject = mediaObjectsByRef[mediaObjectElement.get("ref")];
-			if (mediaObject != null) {
-				mediaObjects.push(mediaObject);
-			}
+			mediaObjectsRefs.push(new MediaObjectRef(assertNotNull(mediaObjectElement.get("ref"), new SddException("A MediaObject is missing its ref."))));
 		}
 		final labelNode = representationElement.firstElementNamed("Label");
 		final detailElement = representationElement.firstElementNamed("Detail");
@@ -76,7 +77,7 @@ class Loader {
 		return {
 			label: if (labelNode != null) labelNode.innerText() else "_",
 			detail: if (detailElement != null) detailElement.innerText() else "_",
-			mediaObjects: mediaObjects
+			mediaObjectsRefs: mediaObjectsRefs
 		};
 	}
 
@@ -123,10 +124,15 @@ class Loader {
 						final categoricalElements = summaryDataElement.elementsNamed("Categorical");
 
 						for (categoricalElement in categoricalElements) {
+							final categorical:CategoricalRef = {
+								ref: assertNotNull(categoricalElement.get("ref"), new SddException("A Categorical is missing its 'ref'.")),
+								stateRefs: []
+							};
 							for (stateElement in categoricalElement.elementsNamed("State")) {
 								final stateId = assertNotNull(stateElement.get("ref"), new SddException("A State is missing its 'ref'."));
-								taxonToAugment.selectedStatesIds.push(stateId);
+								categorical.stateRefs.push(new StateRef(stateId));
 							}
+							taxonToAugment.categoricals.push(categorical);
 						}
 					}
 				} catch (e:SddException) {
@@ -265,12 +271,12 @@ class Loader {
 											new SddException("A InapplicableIf > State is missing its 'ref'."));
 										final state = assertNotNull(statesById.get(stateRef),
 											new SddRefException("InapplicableIf > State", "State", stateRef));
-										augmentedCharacter.inapplicableStatesIds.push(state.id);
+										augmentedCharacter.inapplicableStatesRefs.push(new StateRef(state.id));
 										augmentedCharacter.parentId = state.characterId;
 									}
 								}
 							}
-							if (augmentedCharacter.inapplicableStatesIds.length > 0) {
+							if (augmentedCharacter.inapplicableStatesRefs.length > 0) {
 								charactersById.get(augmentedCharacter.parentId).childrenIds.push(augmentedCharacter.id);
 							}
 						} catch (e:SddException) {

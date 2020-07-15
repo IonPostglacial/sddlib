@@ -1,14 +1,14 @@
 package sdd;
 
 class Taxon extends Representation {
-    public var id: String;
-    public var hid: String;
-    public var parentId: Null<String>;
-    public var selectedStatesIds: Array<String> = [];
-    public var childrenIds: Array<String> = [];
+	public var id:String;
+	public var hid:String;
+	public var parentId:Null<String>;
+	public var categoricals:Array<CategoricalRef> = [];
+	public var childrenIds:Array<String> = [];
 
-    public function new(id: String, representation: Representation) {
-        this.id = id;
-        Representation.assign(this, representation);
-    }
+	public function new(id:String, representation:Representation) {
+		this.id = id;
+		Representation.assign(this, representation);
+	}
 }
