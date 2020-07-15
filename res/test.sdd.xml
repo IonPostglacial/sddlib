@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Datasets xmlns="http://rs.tdwg.org/UBIF/2006/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://rs.tdwg.org/UBIF/2006/Schema/1.1/SDD.xsd">
+    <Dataset xmlns="" xml:lang="fr">
+        <TechnicalMetadata created="2020-06-23T20:34:56.012Z">
+            <Generator name="Bunga" notes="This software is developed and distributed by Li Tian &amp; Nicolas Galipot - Copyright (c) 2020" version="0.9" />
+        </TechnicalMetadata>
+        <Representation>
+            <Label>Sample</Label>
+        </Representation>
+        <TaxonNames>
+            <TaxonName id="myt-1">
+                <Representation>
+                    <Label>Testing some things</Label>
+                    <Detail>Syn: Mikmak&lt;br&gt;&lt;br&gt;NV: Moumouk&lt;br&gt;&lt;br&gt;NV2: Tipi&lt;br&gt;&lt;br&gt;Sense: Moumoute argentée&lt;br&gt;&lt;br&gt;N° Herbier: 6&lt;br&gt;&lt;br&gt;Herbarium Picture: 2&lt;br&gt;&lt;br&gt;Flore Madagascar et Comores&lt;br&gt;fasc 4&lt;br&gt;page 5&lt;br&gt;&lt;br&gt;Website: https://nicolas.galipot.net&lt;br&gt;&lt;br&gt;&lt;p&gt;Doubidou&lt;/p&gt;&lt;p&gt;wah&lt;/p&gt;</Detail>
+                    <MediaObject ref="m1" />
+                </Representation>
+            </TaxonName>
+            <TaxonName id="myt-2">
+                <Representation>
+                    <Label>Tip Top</Label>
+                </Representation>
+            </TaxonName>
+            <TaxonName id="myt-3">
+                <Representation>
+                    <Label>Blabla</Label>
+                </Representation>
+            </TaxonName>
+        </TaxonNames>
+        <TaxonHierarchies>
+            <TaxonHierarchy id="th1">
+                <Representation>
+                    <Label>Default Entity Tree</Label>
+                </Representation>
+                <TaxonHierarchyType>UnspecifiedTaxonomy</TaxonHierarchyType>
+                <Nodes>
+                    <Node id="mytn-myt-1">
+                        <TaxonName ref="myt-1" />
+                    </Node>
+                    <Node id="mytn-myt-2">
+                        <Parent ref="mytn-myt-1" />
+                        <TaxonName ref="myt-2" />
+                    </Node>
+                    <Node id="mytn-myt-3">
+                        <TaxonName ref="myt-3" />
+                    </Node>
+                </Nodes>
+            </TaxonHierarchy>
+        </TaxonHierarchies>
+        <DescriptiveConcepts />
+        <Characters>
+            <CategoricalCharacter id="myd-0">
+                <Representation>
+                    <Label>Some descriptor</Label>
+                </Representation>
+                <States>
+                    <StateDefinition id="s1631592861646693">
+                        <Representation>
+                            <Label>state 1</Label>
+                        </Representation>
+                    </StateDefinition>
+                    <StateDefinition id="s311592861650493">
+                        <Representation>
+                            <Label>and two</Label>
+                        </Representation>
+                    </StateDefinition>
+                    <StateDefinition id="s9021592861652163">
+                        <Representation>
+                            <Label>and 3</Label>
+                        </Representation>
+                    </StateDefinition>
+                    <StateDefinition id="s4321592861653402">
+                        <Representation>
+                            <Label>zero</Label>
+                        </Representation>
+                    </StateDefinition>
+                </States>
+            </CategoricalCharacter>
+            <CategoricalCharacter id="myd-1">
+                <Representation>
+                    <Label>Bobo</Label>
+                </Representation>
+            </CategoricalCharacter>
+            <CategoricalCharacter id="myd-2">
+                <Representation>
+                    <Label>Just because</Label>
+                </Representation>
+            </CategoricalCharacter>
+            <CategoricalCharacter id="myd-3">
+                <Representation>
+                    <Label>Poum</Label>
+                </Representation>
+            </CategoricalCharacter>
+            <CategoricalCharacter id="myd-4">
+                <Representation>
+                    <Label>and yet</Label>
+                </Representation>
+                <States>
+                    <StateDefinition id="s3481592861683651">
+                        <Representation>
+                            <Label>one for the road</Label>
+                        </Representation>
+                    </StateDefinition>
+                </States>
+            </CategoricalCharacter>
+        </Characters>
+        <CharacterTrees>
+            <CharacterTree id="ct1">
+                <Representation>
+                    <Label>Ordre et dependance entre caracteres</Label>
+                </Representation>
+                <ShouldContainAllCharacters>true</ShouldContainAllCharacters>
+                <Nodes>
+                    <CharNode>
+                        <Character ref="myd-0" />
+                    </CharNode>
+                    <CharNode>
+                        <Character ref="myd-1" />
+                    </CharNode>
+                    <CharNode>
+                        <Character ref="myd-2" />
+                    </CharNode>
+                    <CharNode>
+                        <Character ref="myd-3" />
+                    </CharNode>
+                    <CharNode>
+                        <Character ref="myd-4" />
+                    </CharNode>
+                </Nodes>
+            </CharacterTree>
+        </CharacterTrees>
+        <CodedDescriptions>
+            <CodedDescription id="D1">
+                <Representation>
+                    <Label>Testing some things</Label>
+                    <Detail>Syn: Mikmak&lt;br&gt;&lt;br&gt;NV: Moumouk&lt;br&gt;&lt;br&gt;NV2: Tipi&lt;br&gt;&lt;br&gt;Sense: Moumoute argentée&lt;br&gt;&lt;br&gt;N° Herbier: 6&lt;br&gt;&lt;br&gt;Herbarium Picture: 2&lt;br&gt;&lt;br&gt;Flore Madagascar et Comores&lt;br&gt;fasc 4&lt;br&gt;page 5&lt;br&gt;&lt;br&gt;Website: https://nicolas.galipot.net&lt;br&gt;&lt;br&gt;&lt;p&gt;Doubidou&lt;/p&gt;&lt;p&gt;wah&lt;/p&gt;</Detail>
+                    <MediaObject ref="m2" />
+                </Representation>
+                <Scope>
+                    <TaxonName ref="myt-1" />
+                </Scope>
+                <SummaryData>
+                    <Categorical ref="myd-0">
+                        <State ref="s1631592861646693" />
+                    </Categorical>
+                </SummaryData>
+            </CodedDescription>
+            <CodedDescription id="D2">
+                <Representation>
+                    <Label>Tip Top</Label>
+                </Representation>
+                <Scope>
+                    <TaxonName ref="myt-2" />
+                </Scope>
+            </CodedDescription>
+            <CodedDescription id="D3">
+                <Representation>
+                    <Label>Blabla</Label>
+                </Representation>
+                <Scope>
+                    <TaxonName ref="myt-3" />
+                </Scope>
+            </CodedDescription>
+        </CodedDescriptions>
+        <MediaObjects>
+            <MediaObject id="m1">
+                <Representation>
+                    <Label>Testing some things - 1</Label>
+                </Representation>
+                <Type>Image</Type>
+                <Source href="https://haxe.org/img/haxe-logo-horizontal-on-dark.svg" />
+            </MediaObject>
+            <MediaObject id="m2">
+                <Representation>
+                    <Label>Testing some things - 2</Label>
+                </Representation>
+                <Type>Image</Type>
+                <Source href="https://haxe.org/img/haxe-logo-horizontal-on-dark.svg" />
+            </MediaObject>
+        </MediaObjects>
+    </Dataset>
+</Datasets>

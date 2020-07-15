@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Datasets xmlns="http://rs.tdwg.org/UBIF/2006/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://rs.tdwg.org/UBIF/2006/ http://rs.tdwg.org/UBIF/2006/Schema/1.1/SDD.xsd">
+	<TechnicalMetadata created="2020-04-24T12:11:15">
+		<Generator name="Xper3" notes="This software is developed by LIS - Laboratory of Informatics and Systematics (UniversitÃ© Pierre et Marie Curie, UMR 7205, France) - www.infosyslab.fr" version="1.5.1" />
+	</TechnicalMetadata>
+    ::foreach datasets::
+    <Dataset xmlns="" xml:lang="fr">
+        <Representation>
+            <Label>Sample</Label>
+        </Representation>
+        <TaxonNames>
+            ::foreach taxons::
+            <TaxonName id="::id::">
+                <Representation>
+                    <Label>::label::</Label>
+                    <Detail>::detail::</Detail>
+                    ::foreach mediaObjects::
+                    <MediaObject id="::id::">
+                        <Source href="::source::" />
+                        <Type>Image</Type>
+                        <Representation>
+                            <Label>::label::</Label>
+                            <Detail role="Caption">::detail::</Detail>
+                        </Representation>
+                    </MediaObject>
+                    ::end::
+                </Representation>
+            </TaxonName>
+            ::end::
+        </TaxonNames>
+        <TaxonHierarchies>
+            <TaxonHierarchy id="th1">
+                <Representation>
+                    <Label>Default Entity Tree</Label>
+                </Representation>
+                <TaxonHierarchyType>UnspecifiedTaxonomy</TaxonHierarchyType>
+                <Nodes>
+                ::foreach taxons::
+                    <Node id="::hid::">
+                        <Parent ref="$$taxonParentHid(::parentId::)" />
+                        <TaxonName ref="::id::" />
+                    </Node>
+                ::end::
+                </Nodes>
+            </TaxonHierarchy>
+        </TaxonHierarchies>
+        <Characters>
+        ::foreach characters::
+            <CategoricalCharacter id="::id::">
+                <Representation>
+                    <Label>::label::</Label>
+                    <Detail>::detail::</Detail>
+                    ::foreach mediaObjects::
+                    <MediaObject id="::id::">
+                        <Source href="::source::" />
+                        <Type>Image</Type>
+                        <Representation>
+                            <Label>::label::</Label>
+                            <Detail role="Caption">::detail::</Detail>
+                        </Representation>
+                    </MediaObject>
+                    ::end::
+                </Representation>
+                ::if(states.length > 0)::
+                    <States>
+                    ::foreach states::
+                        <StateDefinition id="::id::">
+                            <Representation>
+                                <Label>::label::</Label>
+                                <Detail>::detail::</Detail>
+                                ::foreach mediaObjects::
+                                <MediaObject id="::id::">
+                                    <Source href="::source::" />
+                                    <Type>Image</Type>
+                                    <Representation>
+                                        <Label>::label::</Label>
+                                        <Detail role="Caption">::detail::</Detail>
+                                    </Representation>
+                                </MediaObject>
+                                ::end::
+                            </Representation>
+                        </StateDefinition>
+                    ::end::
+                    </States>
+                ::end::
+            </CategoricalCharacter>
+        ::end::
+        </Characters>
+        <CharacterTrees></CharacterTrees>
+        <CodedDescriptions></CodedDescriptions>
+        <MediaObjects></MediaObjects>
+    </Dataset>
+    ::end::
+</Datasets>
