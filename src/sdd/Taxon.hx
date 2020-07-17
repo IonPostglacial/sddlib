@@ -7,8 +7,10 @@ class Taxon extends Representation {
 	public var categoricals:Array<CategoricalRef> = [];
 	public var childrenIds:Array<String> = [];
 
-	public function new(id:String, representation:Representation) {
+	public function new(id:String, representation:Representation, ?childrenIds) {
+		super(representation.label, representation.detail, representation.mediaObjectsRefs);
 		this.id = id;
-		Representation.assign(this, representation);
+		if (childrenIds != null)
+			this.childrenIds = childrenIds;
 	}
 }

@@ -6,13 +6,19 @@ class Representation {
 	public var detail:String;
 	public var mediaObjectsRefs:Array<MediaObjectRef> = [];
 
+	public inline function new(label, detail, ?mediaObjectsRefs) {
+		this.label = label;
+		this.detail = detail;
+		if (mediaObjectsRefs != null)
+			this.mediaObjectsRefs = mediaObjectsRefs;
+	}
+
 	static inline function nullOrEmpty(s:String)
 		return s == null || s == "";
 
 	public static inline function assign(r1:Representation, r2:Null<Representation>) {
 		if (r2 == null)
 			return;
-
 		if (!nullOrEmpty(r2.label))
 			r1.label = r2.label;
 		if (!nullOrEmpty(r2.detail))

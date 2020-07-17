@@ -1,5 +1,8 @@
+import sdd.State;
+import sdd.Character;
 import sdd.MediaObjectRef;
 import sdd.Representation;
+import sdd.Taxon;
 import utest.Assert;
 import utest.Test;
 
@@ -20,6 +23,21 @@ class TestLoader extends Test {
 		Assert.same(expected.mediaObjectsRefs, actual.mediaObjectsRefs);
 	}
 
+	inline function assertSameTaxon(expected:Taxon, actual:Taxon) {
+		assertSameRepresentation(expected, actual);
+		Assert.equals(expected.id, actual.id);
+		Assert.same(expected.childrenIds, actual.childrenIds);
+	}
+
+	inline function assertSameCharacter(expected:Character, actual:Character) {
+		assertSameRepresentation(expected, actual);
+		Assert.equals(expected.id, actual.id);
+		Assert.equals(expected.parentId, actual.parentId);
+		Assert.same(expected.states, actual.states);
+		Assert.same(expected.childrenIds, actual.childrenIds);
+		Assert.same(expected.inapplicableStatesRefs, actual.inapplicableStatesRefs);
+	}
+
 	function testNoErrors() {
 		Assert.equals(0, loader.exceptionLog.length);
 	}
@@ -27,16 +45,13 @@ class TestLoader extends Test {
 	function testTaxons() {
 		Assert.equals(3, datasets[0].taxons.length);
 
-		Assert.equals("myt-1", datasets[0].taxons[0].id);
-		assertSameRepresentation({
+		assertSameTaxon(new Taxon("myt-1", {
 			label: "Testing some things",
 			detail: "Syn: Mikmak<br><br>NV: Moumouk<br><br>NV2: Tipi<br><br>Sense: Moumoute argentée<br><br>N° Herbier: 6<br><br>Herbarium Picture: 2<br><br>Flore Madagascar et Comores<br>fasc 4<br>page 5<br><br>Website: https://nicolas.galipot.net<br><br><p>Doubidou</p><p>wah</p>",
 			mediaObjectsRefs: [new MediaObjectRef("m1")],
-		}, datasets[0].taxons[0]);
-		Assert.equals("myt-2", datasets[0].taxons[1].id);
-		assertSameRepresentation({label: "Tip Top", detail: "Some detail > 0 in here."}, datasets[0].taxons[1]);
-		Assert.equals("myt-3", datasets[0].taxons[2].id);
-		assertSameRepresentation({label: "Blabla", detail: "_"}, datasets[0].taxons[2]);
+		}, ["myt-2"]), datasets[0].taxons[0]);
+		assertSameTaxon(new Taxon("myt-2", {label: "Tip Top", detail: "Some detail > 0 in here."}), datasets[0].taxons[1]);
+		assertSameTaxon(new Taxon("myt-3", {label: "Blabla", detail: "_"}), datasets[0].taxons[2]);
 	}
 
 	function testDataset() {
@@ -45,5 +60,18 @@ class TestLoader extends Test {
 
 	function testCharacters() {
 		Assert.equals(5, datasets[0].characters.length);
+
+		assertSameCharacter(new Character("myd-0", {label: "Some descriptor", detail: "_"}, [
+			new State("s1631592861646693", "myd-0", {label: "state 1", detail: "_"}),
+			new State("s311592861650493", "myd-0", {label: "and two", detail: "_"}),
+			new State("s9021592861652163", "myd-0", {label: "and 3", detail: "_"}),
+			new State("s4321592861653402", "myd-0", {label: "zero", detail: "_"}),
+		]), datasets[0].characters[0]);
+		assertSameCharacter(new Character("myd-1", {label: "Bobo", detail: "_"}, []), datasets[0].characters[1]);
+		assertSameCharacter(new Character("myd-2", {label: "Just because", detail: "_"}, []), datasets[0].characters[2]);
+		assertSameCharacter(new Character("myd-3", {label: "Poum", detail: "_"}, []), datasets[0].characters[3]);
+		assertSameCharacter(new Character("myd-4", {label: "and yet", detail: "_"}, [
+			new State("s3481592861683651", "myd-4", {label: "one for the road", detail: "_"})
+		]), datasets[0].characters[4]);
 	}
 }
