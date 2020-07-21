@@ -8,7 +8,6 @@ class TestSaver extends Test {
         final datasets = loader.load(sddSample);
         final saver = new sdd.Saver(datasets);
         final savedSample = saver.save();
-        trace(savedSample);
         final savedDataset = loader.load(savedSample);
 
         Assert.same(datasets, savedDataset);
