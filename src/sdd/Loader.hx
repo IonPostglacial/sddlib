@@ -52,7 +52,7 @@ class Loader {
 				final id = assertNotNull(mediaObjectElement.get("id"), new SddException("A MediaObject declaration misses its 'id'."));
 				final representation = loadRepresentation(mediaObjectElement.firstElementNamed("Representation"), mediaObjectsById);
 
-				mediaObjectsById.set(id, {source: sourceElement.get("href"), label: representation.label, detail: representation.detail});
+				mediaObjectsById.set(id, {id: id, source: sourceElement.get("href"), label: representation.label, detail: representation.detail});
 			}
 		}
 
@@ -198,6 +198,7 @@ class Loader {
 					}
 				}
 			for (hierarchy in hierarchiesById) {
+				if (hierarchy.taxon == null) trace(hierarchy);
 				final augmentedTaxon = hierarchy.taxon;
 
 				for (hid in hierarchy.childrenHierarchyIds) {

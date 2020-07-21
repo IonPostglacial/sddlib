@@ -13,7 +13,7 @@
             <TaxonName id="::id::">
                 <Representation>
                     <Label>::label::</Label>
-                    <Detail>::detail::</Detail>
+                    <Detail>$$html(::detail::)</Detail>
                     ::foreach mediaObjectsRefs::
                     <MediaObject ref="::ref::" />
                     ::end::
@@ -30,7 +30,9 @@
                 <Nodes>
                 ::foreach taxons::
                     <Node id="::hid::">
+                    ::if (parentId != null)::
                         <Parent ref="$$taxonParentHid(::parentId::)" />
+                    ::end::
                         <TaxonName ref="::id::" />
                     </Node>
                 ::end::
@@ -42,7 +44,7 @@
             <CategoricalCharacter id="::id::">
                 <Representation>
                     <Label>::label::</Label>
-                    <Detail>::detail::</Detail>
+                    <Detail>$$html(::detail::)</Detail>
                     ::foreach mediaObjectsRefs::
                     <MediaObject ref="::ref::" />
                     ::end::
@@ -53,7 +55,7 @@
                         <StateDefinition id="::id::">
                             <Representation>
                                 <Label>::label::</Label>
-                                <Detail>::detail::</Detail>
+                                <Detail>$$html(::detail::)</Detail>
                                 ::foreach mediaObjectsRefs::
                                 <MediaObject ref="::ref::" />
                                 ::end::
@@ -94,7 +96,7 @@
             <CodedDescription id="D1">
                 <Representation>
                     <Label>::label::</Label>
-                    <Detail>::detail::</Detail>
+                    <Detail>$$html(::detail::)</Detail>
                     ::foreach mediaObjectsRefs::
                     <MediaObject ref="::ref::" />
                     ::end::
@@ -121,7 +123,7 @@
             <MediaObject id="::id::">
                 <Representation>
                     <Label>::label::</Label>
-                    <Detail role="Caption">::detail::</Detail>
+                    <Detail role="Caption">$$html(::detail::)</Detail>
                 </Representation>
                 <Type>Image</Type>
                 <Source href="::source::" />

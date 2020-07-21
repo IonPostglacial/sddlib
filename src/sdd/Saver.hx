@@ -1,5 +1,7 @@
 package sdd;
 
+using Lambda;
+
 @:keep
 @:expose
 class Saver {
@@ -11,7 +13,12 @@ class Saver {
 	}
 
 	@:keep function taxonParentHid(resolve:(code:String) -> Dynamic, parentId:String):String {
-		return "";
+		final parent = this.datasets[0].taxons.find(t -> t.id == parentId);
+		return parent.hid;
+	}
+
+	@:keep function html(resolve:(code:String) -> Dynamic, htmlText:String):String {
+		return StringTools.htmlEscape(htmlText);
 	}
 
 	public function save():String {
