@@ -2,6 +2,8 @@ package sdd;
 
 using StringTools;
 
+@:keep
+@:expose
 class DetailData {
 	public var name:String;
 	public var name2:String;
@@ -24,6 +26,7 @@ class DetailData {
 		this.fasc = fasc;
 		this.page = page;
 		this.detail = detail;
+		this.extra = {};
 	}
 
 	static function escapeRegExp(string:String) {
@@ -64,8 +67,7 @@ class DetailData {
 		final data = new DetailData(name, nameCN, fasc, page, detail);
 
 		for (field in fields) {
-			// TODO: implement extra fields
-			Reflect.setField(data, field.id, findInDescription(representation.detail, field.label));
+			Reflect.setField(if (field.std) data else data.extra, field.id, findInDescription(representation.detail, field.label));
 		}
 		return data;
 	}
