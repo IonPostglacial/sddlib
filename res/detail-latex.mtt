@@ -1,0 +1,51 @@
+\documentclass{beamer}
+
+\usetheme{PaloAlto}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+
+\definecolor{Green}{rgb}{.1,.72,.1}
+
+\title{Taxons}
+\author{Tian Li} %
+\institute{Muséum National d'Histoire Naturelle}
+%\date{2020}
+
+\begin{document}
+
+%{% open a Local TeX Group
+%\setbeamertemplate{sidebar}{}
+% \begin{frame}
+%         \titlepage
+%         \begin{center}
+%           \includegraphics[width=3cm]{sigmalis.png}
+%         \end{center}
+% \end{frame}
+%}% end Local TeX Group
+
+\section{Taxons}
+
+::foreach representations::
+
+\begin{frame}
+    \frametitle{::name::}
+    \framesubtitle{::vernacularName::}
+    \begin{block}{Identification}
+      \begin{itemize}
+      \item name: ::name::
+      \item vernacular name: ::vernacularName::
+      \item chinese name: ::nameCN::
+      \end{itemize}
+    \end{block}
+    \begin{block}{Detail}
+      \begin{itemize}
+      \item detail: ::author::
+      \item meaning: ::meaning::
+      \end{itemize}
+    \end{block}
+\end{frame}
+
+::end::
+
+\end{document}

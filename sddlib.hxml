@@ -2,8 +2,10 @@
 --dce full
 --js bin/SDD.js
 --resource res/sdd.mtt@sdd_template
+--resource res/detail-latex.mtt@tex_template
 -debug
 sdd.Loader
 sdd.Saver
 sdd.DetailData
 sdd.Hierarchy
+sdd.DetailDataToTex
