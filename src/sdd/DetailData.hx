@@ -72,7 +72,7 @@ class DetailData {
 		final name = names[0], nameCN = names[1];
 
 		final fields = Field.standard.concat(extraFields);
-		final floreRe = ~/Flore Madagascar et Comores\s*<br>\s*fasc\s*(\d*)\s*<br>\s*page\s*(\d*)/i;
+		final floreRe = ~/Flore Madagascar et Comores\s*<br>\s*fasc\s+(\d*)\s*<br>\s*page\s+(null|\d*)/i;
 		var fasc:Null<Int> = null, page:Null<Int> = null;
 
 		if (floreRe.match(representation.detail)) {
@@ -80,6 +80,11 @@ class DetailData {
 			page = Std.parseInt(floreRe.matched(2));
 		}
 		var detail = floreRe.replace(removeFromDescription(representation.detail, fields.map(field -> field.label)), "");
+		
+		final emptyParagraphRe = ~/<p>(\n|\t|\s|<br>|&nbsp;)*<\/p>/gi;
+		if (emptyParagraphRe.match(detail)) {
+			detail = emptyParagraphRe.replace(detail, "");
+		}
 		final data = new DetailData(name, nameCN, fasc, page, detail, extraFields);
 
 		for (field in fields) {
