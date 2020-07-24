@@ -6,11 +6,11 @@ using StringTools;
 @:expose
 class DetailData {
 	public var name:String;
+	public var author:String;
 	public var name2:String;
 	public var nameCN:String;
 	public var vernacularName:String;
 	public var vernacularName2:String;
-	public var author:String;
 	public var meaning:String;
 	public var herbariumPicture:String;
 	public var website:String;
@@ -21,9 +21,10 @@ class DetailData {
 	public var fields:Array<Field>;
 	public var extra:Dynamic;
 
-	function new(name, nameCN, fasc, page, detail, fields) {
-		this.name = name;
-		this.nameCN = nameCN;
+	function new(name:Null<String>, author:Null<String>, nameCN:Null<String>, fasc, page, detail, fields) {
+		this.name = if (name != null) name.trim() else "";
+		this.author = if (author != null) author.trim() else "";
+		this.nameCN = if (nameCN != null) nameCN.trim() else "";
 		this.fasc = fasc;
 		this.page = page;
 		this.detail = detail;
@@ -54,22 +55,20 @@ class DetailData {
 	}
 
 	public function toRepresentation():Representation {
-        return {
-			label: name + if (nameCN != null) ' // $nameCN' else "",
-			detail: "" +
-				fields.map(function(field) {
-					final value = Reflect.field(if (field.std) this else this.extra, field.id);
-					if (value == null || value == "") return "";
-					return '${field.label}: $value<br><br>';
-				}).join("") +
-				if (fasc != null) 'Flore Madagascar et Comores<br>fasc ${fasc}<br>page ${page}<br><br>' else "" +
-				detail,
+		return {
+			label: name + if (author != null) ' / $author' else "" + if (nameCN != null) ' / $nameCN' else "",
+			detail: "" + fields.map(function(field) {
+				final value = Reflect.field(if (field.std) this else this.extra, field.id);
+				if (value == null || value == "")
+					return "";
+				return '${field.label}: $value<br><br>';
+			}).join("") + if (fasc != null) 'Flore Madagascar et Comores<br>fasc ${fasc}<br>page ${page}<br><br>' else "" + detail,
 		};
 	}
 
 	public static function fromRepresentation(representation:Representation, extraFields:Array<Field>):DetailData {
-		final names = representation.label.split(" // ");
-		final name = names[0], nameCN = names[1];
+		final names = representation.label.split("/");
+		final name = names[0], author = names[1], nameCN = names[2];
 
 		final fields = Field.standard.concat(extraFields);
 		final floreRe = ~/Flore Madagascar et Comores\s*<br>\s*fasc\s+(\d*)\s*<br>\s*page\s+(null|\d*)/i;
@@ -80,12 +79,12 @@ class DetailData {
 			page = Std.parseInt(floreRe.matched(2));
 		}
 		var detail = floreRe.replace(removeFromDescription(representation.detail, fields.map(field -> field.label)), "");
-		
+
 		final emptyParagraphRe = ~/<p>(\n|\t|\s|<br>|&nbsp;)*<\/p>/gi;
 		if (emptyParagraphRe.match(detail)) {
 			detail = emptyParagraphRe.replace(detail, "");
 		}
-		final data = new DetailData(name, nameCN, fasc, page, detail, extraFields);
+		final data = new DetailData(name, author, nameCN, fasc, page, detail, extraFields);
 
 		for (field in fields) {
 			Reflect.setField(if (field.std) data else data.extra, field.id, findInDescription(representation.detail, field.label));

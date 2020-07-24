@@ -7,7 +7,6 @@ class Field {
 	public var label:String;
 
 	public static final standard:Array<Field> = [
-		{std: true, id: "author", label: "Author"},
 		{std: true, id: "name2", label: "Syn"},
 		{std: true, id: "vernacularName", label: "NV"},
 		{std: true, id: "vernacularName2", label: "NV2"},
