@@ -6,6 +6,7 @@
 -debug
 sdd.Loader
 sdd.Saver
-sdd.DetailData
-sdd.Hierarchy
-sdd.DetailDataToTex
+bunga.DetailData
+bunga.Taxon
+bunga.Hierarchy
+bunga.TaxonToTex

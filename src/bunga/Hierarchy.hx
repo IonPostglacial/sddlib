@@ -1,4 +1,4 @@
-package sdd;
+package bunga;
 
 import haxe.crypto.Base64;
 import haxe.crypto.Crc32;

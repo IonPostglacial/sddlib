@@ -1,14 +1,16 @@
-package sdd;
+package bunga;
 
+import haxe.DynamicAccess;
 using StringTools;
 
 @:keep
 @:expose
+@:structInit
 class DetailData {
 	public var name:String;
 	public var author:String;
-	public var name2:String;
 	public var nameCN:String;
+	public var name2:String;
 	public var vernacularName:String;
 	public var vernacularName2:String;
 	public var meaning:String;
@@ -18,17 +20,27 @@ class DetailData {
 	public var fasc:Null<Int>;
 	public var page:Null<Int>;
 	public var detail:String;
+	public var photos:Array<String>;
 	public var fields:Array<Field>;
 	public var extra:Dynamic;
 
-	function new(name:Null<String>, author:Null<String>, nameCN:Null<String>, fasc, page, detail, fields) {
+	inline function new(name:Null<String>, author:Null<String>, nameCN:Null<String>,
+			fasc, page, detail, photos, fields, 
+			?name2, ?vernacularName, ?vernacularName2, ?meaning, ?noHerbier, ?website, ?herbariumPicture, ?extra) {
 		this.name = if (name != null) name.trim() else "";
 		this.author = if (author != null) author.trim() else "";
 		this.nameCN = if (nameCN != null) nameCN.trim() else "";
+		this.name2 = name2;
+		this.vernacularName = vernacularName;
+		this.vernacularName2 = vernacularName2;
+		this.meaning = meaning;
+		this.herbariumPicture = herbariumPicture;
+		this.website = website;
 		this.fasc = fasc;
 		this.page = page;
 		this.detail = detail;
 		this.fields = fields;
+		this.photos = photos;
 		this.extra = {};
 	}
 
@@ -54,7 +66,7 @@ class DetailData {
 		return desc;
 	}
 
-	public function toRepresentation():Representation {
+	public function toRepresentation():sdd.Representation {
 		return {
 			label: name + if (author != null) ' / $author' else "" + if (nameCN != null) ' / $nameCN' else "",
 			detail: "" + fields.map(function(field) {
@@ -66,7 +78,7 @@ class DetailData {
 		};
 	}
 
-	public static function fromRepresentation(representation:Representation, extraFields:Array<Field>):DetailData {
+	public inline static function fromRepresentation(representation:sdd.Representation, extraFields:Array<Field>, photosByRef:DynamicAccess<String>):DetailData {
 		final names = representation.label.split("/");
 		final name = names[0], author = names[1], nameCN = names[2];
 
@@ -84,7 +96,8 @@ class DetailData {
 		if (emptyParagraphRe.match(detail)) {
 			detail = emptyParagraphRe.replace(detail, "");
 		}
-		final data = new DetailData(name, author, nameCN, fasc, page, detail, extraFields);
+		final photos = representation.mediaObjectsRefs.map(m -> photosByRef[m.ref]);
+		final data:DetailData = { name: name, author: author, nameCN: nameCN, fasc: fasc, page: page, detail: detail, photos: photos, fields: extraFields };
 
 		for (field in fields) {
 			Reflect.setField(if (field.std) data else data.extra, field.id, findInDescription(representation.detail, field.label));

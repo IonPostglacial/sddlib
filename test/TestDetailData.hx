@@ -1,5 +1,5 @@
 import sdd.Representation;
-import sdd.DetailData;
+import bunga.DetailData;
 import utest.Assert;
 import utest.Test;
 
@@ -12,7 +12,7 @@ class TestDetailData extends Test {
 				fasc 6<br>
 				page 24",
 		}
-		final data = DetailData.fromRepresentation(representation, []);
+		final data = DetailData.fromRepresentation(representation, [], {});
 		Assert.equals("A", data.name);
 		Assert.equals("B", data.nameCN);
 		Assert.equals("Hey", data.vernacularName);
