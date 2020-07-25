@@ -32,6 +32,9 @@
     \frametitle{::name::}
     \framesubtitle{::vernacularName::}
     \begin{block}{Identification}
+    ::if (photos.length > 0)::
+      \includegraphics[width=3cm,height=3cm]{$$picture(::photos::)}
+    ::end::
       \begin{itemize}
       \item name: ::name::
       \item vernacular name: ::vernacularName::
@@ -40,6 +43,7 @@
     \end{block}
     \begin{block}{Description}
       \begin{itemize}
+      \item yep
       ::foreach descriptions::
       \item ::descriptor.name::: ::foreach states:: ::name:: ::end:: 
       ::end::

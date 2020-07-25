@@ -19,8 +19,6 @@ typedef HierarchyEntry = {
 @:keep
 @:expose
 class Hierarchy {
-    static var forbiddenChars = [" ", "*", ".", '"', "/", "\\", "[", "]", ":", ";", "|", ","];
-
     static function getEntries(hierarchy:DynamicAccess<HierarchyEntry>, ?entries:List<haxe.zip.Entry> = null, ?path=""):List<haxe.zip.Entry> {
         if (hierarchy == null) return new List();
         if (entries == null) entries = new List<haxe.zip.Entry>();
@@ -28,10 +26,7 @@ class Hierarchy {
         
         for(entry in hierarchy) {
             if (entry.topLevel || path != "") {
-                var entryName = entry.name;
-                for (char in forbiddenChars) {
-                    entryName = entryName.replace(char, "_");
-                }
+                var entryName = FileNameGenerator.generate(entry.name);
                 final currentPath = path + entryName.urlEncode() + "/";
                 entries.push({
                     fileName: currentPath, 
