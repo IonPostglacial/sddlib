@@ -1,6 +1,6 @@
 package bunga;
 
-import haxe.crypto.Base64;
+import haxe.io.BytesData;
 import haxe.crypto.Crc32;
 import haxe.io.Bytes;
 import haxe.DynamicAccess;
@@ -43,11 +43,11 @@ class Hierarchy {
         return entries;
     }
 
-    public static function toZip(hierarchy:DynamicAccess<HierarchyEntry>):String {
+    public static function toZip(hierarchy:DynamicAccess<HierarchyEntry>):BytesData {
         final entries = getEntries(hierarchy);
         final bytes = new BytesOutput();
         final writer = new Writer(bytes);
         writer.write(entries);
-        return Base64.encode(bytes.getBytes());
+        return bytes.getBytes().getData();
     }
 }

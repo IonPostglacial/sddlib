@@ -2,9 +2,7 @@ package bunga;
 
 import haxe.io.BytesData;
 import js.lib.Promise;
-import haxe.io.Path;
 import haxe.io.Bytes;
-import haxe.crypto.Base64;
 import haxe.crypto.Crc32;
 import haxe.io.BytesOutput;
 import haxe.zip.Writer;
@@ -26,13 +24,14 @@ class TTMacro {
 @:keep
 @:expose
 class TaxonToTex {
-    public static function export(taxons:Array<Taxon>):Promise<BytesData> {
-        final texTemplate = haxe.Resource.getString("tex_template");
-        final template = new haxe.Template(texTemplate);
-        final entries = new List<haxe.zip.Entry>();
-        final pictureNameByUrl = new Map<String, String>();
+    var photos:Array<String>;
+    var pictureNameByUrl:Map<String, String>;
+    var progressListeners:Array<(progress:Int, progressMax:Int)->Void>;
 
-        final photos = [];
+    public function new(taxons:Array<Taxon>) {
+        progressListeners = [];
+        pictureNameByUrl = [];
+        photos = [];
         for (taxon in taxons) {
             if (taxon.photos.length > 0) {
                 final photo = taxon.photos[0];
@@ -40,8 +39,28 @@ class TaxonToTex {
                 photos.push(photo);
             }
         }
+    }
 
-        final texFileContent = Bytes.ofString(template.execute({taxons: taxons}, new TTMacro(pictureNameByUrl)));
+    @:keep public function picture(resolve:(code:String) -> Dynamic, urls:Array<String>) {
+        return pictureNameByUrl[urls[0]];
+    }
+
+    public function onProgress(listener:(progress:Int, progressMax:Int)->Void) {
+        progressListeners.push(listener);
+    }
+
+    function progressed(progress:Int, progresMax:Int) {
+        for (listener in progressListeners) {
+            listener(progress, progresMax);
+        }
+    }
+
+    public function export(taxons:Array<Taxon>):Promise<BytesData> {
+        final texTemplate = haxe.Resource.getString("tex_template");
+        final template = new haxe.Template(texTemplate);
+        final entries = new List<haxe.zip.Entry>();
+
+        final texFileContent = Bytes.ofString(template.execute({taxons: taxons}, this));
 
         entries.push({
             fileName: "latex/export.tex", 
@@ -57,8 +76,8 @@ class TaxonToTex {
             var semaphore = photos.length;
 
             function semDec() {
-                trace('dec: $semaphore');
                 semaphore--;
+                progressed(photos.length - semaphore, photos.length);
                 if (semaphore == 0) {
                     final bytes = new BytesOutput();
                     final writer = new Writer(bytes);
