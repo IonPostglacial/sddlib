@@ -10,18 +10,6 @@ import haxe.zip.Writer;
 using StringTools;
 
 @:keep
-class TTMacro {
-    var pictureNameByUrl:Map<String,String>;
-    public function new(pictureNameByUrl) {
-        this.pictureNameByUrl = pictureNameByUrl;
-    }
-
-    @:keep public function picture(resolve:(code:String) -> Dynamic, urls:Array<String>) {
-        return pictureNameByUrl[urls[0]];
-    }
-}
-
-@:keep
 @:expose
 class TaxonToTex {
     var photos:Array<String>;
