@@ -13,7 +13,7 @@ class Taxon extends HierarchicalItem {
         this.descriptions = descriptions;
     }
 
-    public static function fromSdd(taxon: sdd.Taxon, extraFields:Array<Field>, photosByRef:DynamicAccess<String>, descriptors:DynamicAccess<Character>, statesById:DynamicAccess<sdd.State>): Taxon {
+    public static function fromSdd(taxon: sdd.Taxon, extraFields:Array<Field>, photosByRef:DynamicAccess<String>, descriptors:DynamicAccess<Character>, statesById:DynamicAccess<State>): Taxon {
         final descriptions = new Map<String, Description>();
         for (categorical in taxon.categoricals) {
             final description:Description = {
