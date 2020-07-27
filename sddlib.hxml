@@ -8,8 +8,6 @@ sdd.Loader
 sdd.Saver
 bunga.DetailData
 bunga.Hierarchy
-bunga.State
-bunga.Character
-bunga.Taxon
+bunga.Dataset
 bunga.TaxonToTex
 bunga.ImageCache

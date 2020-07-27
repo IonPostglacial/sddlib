@@ -22,10 +22,10 @@ class DetailData {
 	public var detail:String;
 	public var photos:Array<String>;
 	public var fields:Array<Field>;
-	public var extra:Dynamic;
+	public var extra:DynamicAccess<Any>;
 
-	inline function new(name:Null<String>, author:Null<String>, nameCN:Null<String>,
-			fasc, page, detail, photos, fields, 
+	inline function new(?name:String, ?author:String, ?nameCN:String,
+			?fasc, ?page, ?detail:String, ?photos:Array<String>, ?fields:Array<Field>, 
 			?name2, ?vernacularName, ?vernacularName2, ?meaning, ?noHerbier, ?website, ?herbariumPicture, ?extra) {
 		this.name = if (name != null) name.trim() else "";
 		this.author = if (author != null) author.trim() else "";
@@ -38,9 +38,9 @@ class DetailData {
 		this.website = website;
 		this.fasc = fasc;
 		this.page = page;
-		this.detail = detail;
-		this.fields = fields;
-		this.photos = photos;
+		this.detail = if (detail != null) detail else "";
+		this.fields = if (fields != null) fields else [];
+		this.photos = if (photos != null) photos else [];
 		this.extra = {};
 	}
 

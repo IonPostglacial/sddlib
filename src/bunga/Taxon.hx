@@ -2,14 +2,12 @@ package bunga;
 
 import haxe.DynamicAccess;
 
-@:keep
-@:expose
 @:structInit
-class Taxon extends HierarchicalItem {
+class Taxon extends HierarchicalItem<Taxon> {
     public var descriptions:Array<Description>;
 
-    public inline function new(id, hid, parentId, topLevel, children, descriptions, data: DetailData) {
-        super("taxon", id, hid, parentId, topLevel, children, data);
+    public inline function new(id, hid, parentId, topLevel, childrenIds, descriptions, data: DetailData) {
+        super("taxon", id, hid, parentId, topLevel, childrenIds, data);
         this.descriptions = descriptions;
     }
 
@@ -27,7 +25,7 @@ class Taxon extends HierarchicalItem {
             hid: taxon.id,
             parentId: taxon.parentId,
             topLevel: taxon.parentId == null,
-            children: taxon.childrenIds,
+            childrenIds: taxon.childrenIds,
             descriptions: [for (_ => value in descriptions) value],
             data: DetailData.fromRepresentation(taxon, extraFields, photosByRef)
         };

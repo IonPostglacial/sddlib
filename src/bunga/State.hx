@@ -2,8 +2,6 @@ package bunga;
 
 import haxe.DynamicAccess;
 
-@:keep
-@:expose
 @:structInit
 class State {
     public var id:String;
