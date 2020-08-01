@@ -4,30 +4,34 @@ import haxe.DynamicAccess;
 
 @:structInit
 class Taxon extends HierarchicalItem<Taxon> {
-    public var descriptions:Array<Description>;
+	public var descriptions:Array<Description>;
 
-    public inline function new(id, hid, parentId, topLevel, childrenIds, descriptions, data: DetailData) {
-        super("taxon", id, hid, parentId, topLevel, childrenIds, data);
-        this.descriptions = descriptions;
-    }
+	public inline function new(item:HierarchicalItem<Taxon>, descriptions) {
+		super("taxon", item.id, item.hid, item.parentId, item.topLevel, item.children.keys(), item);
+		this.descriptions = descriptions;
+	}
 
-    public static function fromSdd(taxon: sdd.Taxon, extraFields:Array<Field>, photosByRef:DynamicAccess<String>, descriptors:DynamicAccess<Character>, statesById:DynamicAccess<State>): Taxon {
-        final descriptions = new Map<String, Description>();
-        for (categorical in taxon.categoricals) {
-            final description:Description = {
-                descriptor: descriptors[categorical.ref],
-                states: categorical.stateRefs.map(s -> statesById[s.ref])
-            };
-            descriptions[categorical.ref] = description;
-        }
-        return {
-            id: taxon.id,
-            hid: taxon.id,
-            parentId: taxon.parentId,
-            topLevel: taxon.parentId == null,
-            childrenIds: taxon.childrenIds,
-            descriptions: [for (_ => value in descriptions) value],
-            data: DetailData.fromRepresentation(taxon, extraFields, photosByRef)
-        };
-    }
+	public static function fromSdd(taxon:sdd.Taxon, extraFields:Array<Field>, photosByRef:DynamicAccess<String>, descriptors:DynamicAccess<Character>,
+			statesById:DynamicAccess<State>):Taxon {
+		final descriptions = new Map<String, Description>();
+		for (categorical in taxon.categoricals) {
+			final description:Description = {
+				descriptor: descriptors[categorical.ref],
+				states: categorical.stateRefs.map(s -> statesById[s.ref])
+			};
+			descriptions[categorical.ref] = description;
+		}
+		return {
+			item: {
+				type: "taxon",
+				id: taxon.id,
+				hid: taxon.id,
+				parentId: taxon.parentId,
+				topLevel: taxon.parentId == null,
+				childrenIds: taxon.childrenIds,
+				data: DetailData.fromRepresentation(taxon, extraFields, photosByRef)
+			},
+			descriptions: [for (_ => value in descriptions) value],
+		};
+	}
 }
