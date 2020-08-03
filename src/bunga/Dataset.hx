@@ -6,61 +6,61 @@ import haxe.DynamicAccess;
 @:expose
 @:structInit
 class Dataset extends DetailData {
-    public var items:DynamicAccess<Taxon>;
-    public var descriptors:DynamicAccess<Character>;
-    
-    static function extractStatesById(sddContent:sdd.Dataset, photosByRef:DynamicAccess<String>) {
-        final statesById:DynamicAccess<State> = {};
+	public var items:DynamicAccess<Taxon>;
+	public var descriptors:DynamicAccess<Character>;
 
-        for (state in sddContent.states) {
-            statesById[state.id] = State.fromSdd(state, photosByRef);
-        }
-        return statesById;
-    }
-    
-    static function extractItemsById(sddContent:sdd.Dataset, descriptors, extraFields, statesById, photosByRef) {
-        final itemsById:DynamicAccess<Taxon> = {};
-        
-        for (taxon in sddContent.taxons) {
-            itemsById[taxon.id] = Taxon.fromSdd(taxon, extraFields, photosByRef, descriptors, statesById);
-        }
-        return itemsById;
-    }
-    
-    static function extractDescriptorsById(sddContent:sdd.Dataset, statesById:DynamicAccess<State>, photosByRef:DynamicAccess<String>) {
-        final descriptorsById:DynamicAccess<Character> = {};
-        
-        for (character in sddContent.characters) {
-            descriptorsById[character.id] = Character.fromSdd(character, photosByRef, statesById);
-        }
-        return descriptorsById;
-    }
-    
-    static function extractPhotosByRef(sddContent:sdd.Dataset) {
-        final photosByRef:DynamicAccess<String> = {};
+	static function extractStatesById(sddContent:sdd.Dataset, photosByRef:DynamicAccess<String>) {
+		final statesById:DynamicAccess<State> = {};
 
-        for (mediaObject in sddContent.mediaObjects) {
-            photosByRef[mediaObject.id] = mediaObject.source;
-        }
-        return photosByRef;
-    }
+		for (state in sddContent.states) {
+			statesById[state.id] = State.fromSdd(state, photosByRef);
+		}
+		return statesById;
+	}
 
-    public static function fromSdd(dataset:sdd.Dataset, extraFields:Array<Field>):Dataset {
-        final photosByRef = extractPhotosByRef(dataset);
-        final statesById = extractStatesById(dataset, photosByRef);
-        
-        final descriptors = extractDescriptorsById(dataset, statesById, photosByRef);
+	static function extractItemsById(sddContent:sdd.Dataset, descriptors, extraFields, statesById, photosByRef) {
+		final itemsById:DynamicAccess<Taxon> = {};
 
-        for (descriptor in descriptors) {
-            descriptor.hydrateChildren(descriptors);
-        }
-        
-        final items = extractItemsById(dataset, descriptors, extraFields, statesById, photosByRef);
+		for (taxon in sddContent.taxons) {
+			itemsById[taxon.id] = Taxon.fromSdd(taxon, extraFields, photosByRef, descriptors, statesById);
+		}
+		return itemsById;
+	}
 
-        for (item in items) {
-            item.hydrateChildren(items);
-        }
-    
-        return { items: items, descriptors: descriptors };
-    }
+	static function extractDescriptorsById(sddContent:sdd.Dataset, statesById:DynamicAccess<State>, photosByRef:DynamicAccess<String>) {
+		final descriptorsById:DynamicAccess<Character> = {};
+
+		for (character in sddContent.characters) {
+			descriptorsById[character.id] = Character.fromSdd(character, photosByRef, statesById);
+		}
+		return descriptorsById;
+	}
+
+	static function extractPhotosByRef(sddContent:sdd.Dataset) {
+		final photosByRef:DynamicAccess<String> = {};
+
+		for (mediaObject in sddContent.mediaObjects) {
+			photosByRef[mediaObject.id] = mediaObject.source;
+		}
+		return photosByRef;
+	}
+
+	public static function fromSdd(dataset:sdd.Dataset, extraFields:Array<Field>):Dataset {
+		final photosByRef = extractPhotosByRef(dataset);
+		final statesById = extractStatesById(dataset, photosByRef);
+
+		final descriptors = extractDescriptorsById(dataset, statesById, photosByRef);
+
+		for (descriptor in descriptors) {
+			descriptor.hydrateChildren(descriptors);
+		}
+
+		final items = extractItemsById(dataset, descriptors, extraFields, statesById, photosByRef);
+
+		for (item in items) {
+			item.hydrateChildren(items);
+		}
+
+		return {items: items, descriptors: descriptors};
+	}
 }
