@@ -21,7 +21,6 @@ class DetailData {
 	public var page:Null<Int>;
 	public var detail:String;
 	public var photos:Array<String>;
-	public var fields:Array<Field>;
 	public var extra:DynamicAccess<Any>;
 
 	inline function new(?name:String, ?author:String, ?nameCN:String,
@@ -39,7 +38,6 @@ class DetailData {
 		this.fasc = fasc;
 		this.page = page;
 		this.detail = if (detail != null) detail else "";
-		this.fields = if (fields != null) fields else [];
 		this.photos = if (photos != null) photos else [];
 		this.extra = {};
 	}
@@ -62,10 +60,10 @@ class DetailData {
 		return desc;
 	}
 
-	public function toRepresentation():sdd.Representation {
+	public function toRepresentation(extraFields:Array<Field>):sdd.Representation {
 		return {
 			label: name + if (author != null) ' / $author' else "" + if (nameCN != null) ' / $nameCN' else "",
-			detail: "" + fields.map(function(field) {
+			detail: "" + extraFields.map(function(field) {
 				final value = Reflect.field(if (field.std) this else this.extra, field.id);
 				if (value == null || value == "")
 					return "";

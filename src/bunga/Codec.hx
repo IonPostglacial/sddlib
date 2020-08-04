@@ -2,23 +2,23 @@ package bunga;
 
 import haxe.DynamicAccess;
 
-class CodedHierarchicalItem<T> extends DetailData {
+class CodedHierarchicalItem<T:Item> extends Item {
 	public var type:String;
-	public var id:String;
 	public var hid:String;
 	public var parentId:Null<String>;
 	public var topLevel:Bool;
-	public var children:Array<String>;
+	public var children:Array<String> = [];
 
 	public function new(item:HierarchicalItem<T>) {
-		super(item.name, item.author, item.nameCN, item.fasc, item.page, item.detail, item.photos, item.fields, item.name2, item.vernacularName,
-			item.vernacularName2, item.meaning, item.noHerbier, item.website, item.herbariumPicture, item.extra);
+		super(item.id, new DetailData(item.name, item.author, item.nameCN, item.fasc, item.page, item.detail, item.photos, item.name2, item.vernacularName,
+			item.vernacularName2, item.meaning, item.noHerbier, item.website, item.herbariumPicture, item.extra));
 		this.type = item.type;
-		this.id = item.id;
 		this.hid = item.hid;
 		this.parentId = item.parentId;
 		this.topLevel = item.topLevel;
-		this.children = item.children.keys();
+		for (child in item.children) {
+			this.children.push(child.id);
+		}
 	}
 }
 
@@ -77,7 +77,7 @@ class CodedDataset {
 @:keep
 @:expose
 class Codec {
-	public static function decodeHierarchicalItem<T>(item:CodedHierarchicalItem<T>):HierarchicalItem<T> {
+	public static function decodeHierarchicalItem<T:Item>(item:CodedHierarchicalItem<T>):HierarchicalItem<T> {
 		var item:HierarchicalItem<T> = {
 			type: item.type,
 			id: item.id,
