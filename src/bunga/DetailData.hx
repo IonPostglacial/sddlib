@@ -44,12 +44,8 @@ class DetailData {
 		this.extra = {};
 	}
 
-	static function escapeRegExp(string:String) {
-		return ~/[.*+?^${}()|[\]\\]/g.replace(string, '\\$&'); // $& means the whole matched string
-	}
-
 	static function findInDescription(description:String, section:String) {
-		final re = new EReg('${escapeRegExp(section)}\\s*:\\s*(.*?)(?=<br><br>)', "i");
+		final re = new EReg('${ERegTools.escape(section)}\\s*:\\s*(.*?)(?=<br><br>)', "i");
 		if (re.match(description))
 			return re.matched(1).trim();
 		else
@@ -60,7 +56,7 @@ class DetailData {
 		var desc = description;
 
 		for (section in sections) {
-			final re = new EReg('${escapeRegExp(section)}\\s*:\\s*(.*?)(?=<br><br>)', "i");
+			final re = new EReg('${ERegTools.escape(section)}\\s*:\\s*(.*?)(?=<br><br>)', "i");
 			desc = re.replace(desc, "");
 		}
 		return desc;

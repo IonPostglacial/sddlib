@@ -21,10 +21,10 @@ class DetailHighlighter {
     }
 
     public function highlightTaxons(taxons:DynamicAccess<Taxon>) {
+        var reTxt = wordsToHighlight.map(word -> ERegTools.escape(word)).join("|");
+        var re = new EReg('([^\\w<>]|^|<p>)($reTxt)([^\\w<>]|$|</p>)', "g");
         for (taxon in taxons) {
-            for (word in wordsToHighlight) {
-                taxon.detail = new EReg ('([^\\w])($word)([^\\w])', "g").replace(taxon.detail, '$1<b>$2</b>$3');
-            }
+            taxon.detail = re.replace(taxon.detail, '$1<b>$2</b>$3');
         }
     }
 }
