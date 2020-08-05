@@ -8,6 +8,14 @@ import haxe.DynamicAccess;
 class Dataset extends DetailData {
 	public var items:DynamicAccess<Taxon>;
 	public var descriptors:DynamicAccess<Character>;
+	public var books:Array<Book>;
+
+	public function new(items, descriptors, ?books) {
+		super();
+		this.items = items;
+		this.descriptors = descriptors;
+		this.books = if(books != null) books else [for (book in Book.standard) book];
+	}
 
 	static function extractStatesById(sddContent:sdd.Dataset, photosByRef:DynamicAccess<String>) {
 		final statesById:DynamicAccess<State> = {};

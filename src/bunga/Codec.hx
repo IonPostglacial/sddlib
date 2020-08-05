@@ -34,9 +34,11 @@ class CodedDescription {
 
 class CodedTaxon extends CodedHierarchicalItem<Taxon> {
 	public var descriptions:Array<CodedDescription>;
+	public var bookInfoByIds:DynamicAccess<BookInfo> = {};
 
 	public function new(taxon:Taxon) {
 		super(taxon);
+		bookInfoByIds = taxon.bookInfoByIds;
 		descriptions = taxon.descriptions.map(d -> new CodedDescription(d.descriptor.id, d.states.map(s -> s.id)));
 	}
 }
@@ -90,9 +92,22 @@ class Codec {
 		return item;
 	}
 
-	public static function decodeTaxon(taxon:CodedTaxon, descriptions:DynamicAccess<Character>, states:DynamicAccess<State>):Taxon {
+	public static function decodeTaxon(taxon:CodedTaxon, descriptions:DynamicAccess<Character>, states:DynamicAccess<State>, books:Array<Book>):Taxon {
+		var bookInfoByIds = if (taxon.bookInfoByIds != null) taxon.bookInfoByIds else {};
+
+		if (bookInfoByIds.keys().length == 0) {
+			for (book in Book.standard) {
+				final info:BookInfo =  {
+					fasc: if (book.id == "fmc") "" + taxon.fasc else "",
+					page: if (book.id == "fmc") taxon.page else null,
+					detail: ""
+				};
+				bookInfoByIds[book.id] = info;
+			}
+		}
 		return {
 			item: decodeHierarchicalItem(taxon),
+			bookInfoByIds: bookInfoByIds,
 			descriptions: taxon.descriptions.map(function(d):Description return {
 				descriptor: descriptions[d.descriptorId],
 				states: d.statesIds.map(id -> states[id]),
@@ -119,17 +134,18 @@ class Codec {
 		final states:DynamicAccess<State> = {};
 		final descriptors:DynamicAccess<Character> = {};
 		final items:DynamicAccess<Taxon> = {};
+		final books = [for (book in Book.standard) book];
 
 		for (state in dataset.states)
 			states[state.id] = state;
 		for (descriptor in dataset.descriptors)
 			descriptors[descriptor.id] = decodeCharacter(descriptor, states);
 		for (taxon in dataset.taxons)
-			items[taxon.id] = decodeTaxon(taxon, descriptors, states);
+			items[taxon.id] = decodeTaxon(taxon, descriptors, states, books);
 		for (descriptor in descriptors)
 			descriptor.hydrateChildren(descriptors);
 		for (item in items)
 			item.hydrateChildren(items);
-		return {items: items, descriptors: descriptors};
+		return {items: items, descriptors: descriptors, books: books};
 	}
 }

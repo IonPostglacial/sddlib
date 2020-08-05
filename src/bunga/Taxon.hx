@@ -5,10 +5,14 @@ import haxe.DynamicAccess;
 @:structInit
 class Taxon extends HierarchicalItem<Taxon> {
 	public var descriptions:Array<Description>;
+	public var bookInfoByIds:DynamicAccess<BookInfo> = {};
 
-	public inline function new(item:HierarchicalItem<Taxon>, descriptions) {
+	public inline function new(item:HierarchicalItem<Taxon>, descriptions, ?bookInfoByIds) {
 		super("taxon", item.id, item.hid, item.parentId, item.topLevel, item.children.keys(), item);
 		this.descriptions = descriptions;
+		if (bookInfoByIds != null) {
+			this.bookInfoByIds = bookInfoByIds;
+		}
 	}
 
 	public static function fromSdd(taxon:sdd.Taxon, extraFields:Array<Field>, photosByRef:DynamicAccess<String>, descriptors:DynamicAccess<Character>,

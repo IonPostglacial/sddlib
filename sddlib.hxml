@@ -8,6 +8,7 @@ sdd.Loader
 sdd.Saver
 bunga.DetailData
 bunga.Hierarchy
+bunga.Book
 bunga.Dataset
 bunga.TaxonToTex
 bunga.ImageCache
