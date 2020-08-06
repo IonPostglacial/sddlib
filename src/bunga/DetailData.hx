@@ -39,7 +39,7 @@ class DetailData {
 		this.page = page;
 		this.detail = if (detail != null) detail else "";
 		this.photos = if (photos != null) photos else [];
-		this.extra = {};
+		this.extra = extra;
 	}
 
 	static function findInDescription(description:String, section:String) {

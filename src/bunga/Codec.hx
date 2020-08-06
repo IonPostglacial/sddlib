@@ -17,7 +17,12 @@ class CodedHierarchicalItem<T:Item> extends Item {
 		this.parentId = item.parentId;
 		this.topLevel = item.topLevel;
 		for (child in item.children) {
-			this.children.push(child.id);
+			if (child == null) {
+				trace(item.name + " has null child");
+				trace(item);
+			} else {
+				this.children.push(child.id);
+			}
 		}
 	}
 }

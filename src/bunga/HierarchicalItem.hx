@@ -19,7 +19,13 @@ class HierarchicalItem<T:Item> extends Item {
 
     public function hydrateChildren(hierarchyById:DynamicAccess<T>) {
         for (id in children.keys()) {
-            children[id] = hierarchyById[id];
+            final child = hierarchyById[id];
+            if (child == null) {
+                Reflect.deleteField(children, id);
+                trace('Child not found: $name > $id');
+            } else {
+                children[id] = hierarchyById[id];
+            }
         }
     }
 
