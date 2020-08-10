@@ -1,6 +1,15 @@
 package bunga;
 
+import sdd.MediaObject;
 import haxe.DynamicAccess;
+using Lambda;
+
+@:structInit
+class SddCharacterData {
+	public var character:sdd.Character;
+	public var states:Array<sdd.State>;
+	public var mediaObjects:Array<sdd.MediaObject>;
+}
 
 @:structInit
 class Character extends HierarchicalItem<Character> {
@@ -26,6 +35,23 @@ class Character extends HierarchicalItem<Character> {
 			},
 			states: character.states.map(s -> statesById[s.id]),
 			inapplicableStates: character.inapplicableStatesRefs.map(s -> statesById[s.ref]),
+		};
+	}
+
+	public static function toSdd(character:Character, extraFields:Array<Field>, mediaObjects:Array<MediaObject>):SddCharacterData {
+		final statesData = character.states.map(s -> State.toSdd(s));
+		final states = statesData.map(data -> data.state);
+		return {
+			character: {
+				id: character.id,
+				parentId: character.parentId,
+				representation: character.toRepresentation(extraFields),
+				states: states,
+				inapplicableStatesRefs: character.inapplicableStates.map(s -> new sdd.StateRef(s.id)),
+				childrenIds: character.children.keys(),
+			},
+			states: states,
+			mediaObjects: statesData.flatMap(data -> data.mediaObjects).concat([]),
 		};
 	}
 }

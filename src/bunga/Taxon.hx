@@ -1,6 +1,12 @@
 package bunga;
 
+import sdd.MediaObject;
 import haxe.DynamicAccess;
+
+@:structInit class SddTaxonData {
+	public var taxon:sdd.Taxon;
+	public var mediaObjects:Array<sdd.MediaObject>;
+}
 
 @:structInit
 class Taxon extends HierarchicalItem<Taxon> {
@@ -36,6 +42,23 @@ class Taxon extends HierarchicalItem<Taxon> {
 				data: DetailData.fromRepresentation(taxon, extraFields, photosByRef)
 			},
 			descriptions: [for (_ => value in descriptions) value],
+		};
+	}
+
+	public static function toSdd(taxon:Taxon, extraFields:Array<Field>, mediaObjects:Array<MediaObject>):SddTaxonData {
+		final sddTaxon:sdd.Taxon = {
+			id: taxon.id,
+			parentId: taxon.parentId,
+			representation: taxon.toRepresentation(extraFields),
+			childrenIds: taxon.children.keys(),
+			categoricals: taxon.descriptions.map(function (d):sdd.CategoricalRef return {
+				ref: d.descriptor.id, 
+				stateRefs: d.states.map(s -> new sdd.StateRef(s.id))
+			}),
+		};
+		return {
+			taxon: sddTaxon,
+			mediaObjects: []
 		};
 	}
 }

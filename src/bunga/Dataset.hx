@@ -71,4 +71,27 @@ class Dataset extends DetailData {
 
 		return {items: items, descriptors: descriptors};
 	}
+
+	public static function toSdd(dataset:Dataset, extraFields:Array<Field>):sdd.Dataset {
+		var taxons = new Array<sdd.Taxon>(), characters = new Array<sdd.Character>();
+		var states = new Array<sdd.State>(), mediaObjects = new Array<sdd.MediaObject>();
+		
+		for (taxon in dataset.items) {
+			final sddData = Taxon.toSdd(taxon, extraFields, mediaObjects);
+			taxons.push(sddData.taxon);
+			mediaObjects = mediaObjects.concat(sddData.mediaObjects);
+		}
+		for (character in dataset.descriptors) {
+			final sddData = Character.toSdd(character, extraFields, mediaObjects);
+			characters.push(sddData.character);
+			states = states.concat(sddData.states);
+			mediaObjects = mediaObjects.concat(sddData.mediaObjects);
+		}
+		return {
+			taxons: taxons,
+			characters: characters,
+			states: states,
+			mediaObjects: mediaObjects,
+		};
+	}
 }

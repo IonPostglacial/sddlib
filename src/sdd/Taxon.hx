@@ -1,5 +1,6 @@
 package sdd;
 
+@:structInit
 class Taxon extends Representation {
 	public var id:String;
 	public var hid:String;
@@ -7,7 +8,7 @@ class Taxon extends Representation {
 	public var categoricals:Array<CategoricalRef> = [];
 	public var childrenIds:Array<String> = [];
 
-	public function new(id:String, representation:Representation, ?childrenIds, ?categoricals) {
+	public function new(id:String, parentId:Null<String>, representation:Representation, ?childrenIds, ?categoricals) {
 		super(representation.label, representation.detail, representation.mediaObjectsRefs);
 		this.id = id;
 		if (childrenIds != null)

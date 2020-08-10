@@ -101,7 +101,7 @@ class Loader {
 		for (taxonElement in taxonNamesElement.elementsNamed("TaxonName")) {
 			final taxonId = assertNotNull(taxonElement.get("id"), new SddException("A Taxon is missing its 'id'."));
 
-			taxonsById.set(taxonId, new Taxon(taxonId, loadRepresentation(taxonElement.firstElementNamed("Representation"), mediaObjectsById)));
+			taxonsById.set(taxonId, new Taxon(taxonId, null, loadRepresentation(taxonElement.firstElementNamed("Representation"), mediaObjectsById)));
 		}
 
 		final codedDescriptionsElement = datasetElement.firstElementNamed("CodedDescriptions");
@@ -239,7 +239,7 @@ class Loader {
 				}
 
 				charactersById.set(characterId,
-					new Character(characterId, loadRepresentation(characterElement.firstElementNamed("Representation"), mediaObjectsById), states));
+					new Character(characterId, null, loadRepresentation(characterElement.firstElementNamed("Representation"), mediaObjectsById), states));
 			} catch (e:SddException) {
 				if (strictMode) {
 					throw e;

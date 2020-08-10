@@ -1,5 +1,6 @@
 package sdd;
 
+@:structInit
 class State extends Representation {
 	public var id:String;
 	public var characterId:String;
