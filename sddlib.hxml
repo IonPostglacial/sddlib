@@ -1,5 +1,8 @@
 --class-path src
 --dce full
+-lib hxtsdgen
+-D dts
+-D js-es=6
 --js bin/SDD.js
 --resource res/sdd.mtt@sdd_template
 --resource res/detail-latex.mtt@tex_template
@@ -10,6 +13,8 @@ bunga.DetailData
 bunga.Hierarchy
 bunga.Book
 bunga.Dataset
+bunga.Character
+bunga.Taxon
 bunga.TaxonToTex
 bunga.ImageCache
 bunga.DetailHighlighter

@@ -2,21 +2,30 @@ package bunga;
 
 import sdd.MediaObject;
 import haxe.DynamicAccess;
+
 using Lambda;
 
-@:structInit
-class SddCharacterData {
+@:structInit class SddCharacterData {
 	public var character:sdd.Character;
 	public var states:Array<sdd.State>;
 	public var mediaObjects:Array<sdd.MediaObject>;
 }
 
+interface CharacterCreationData {
+	var name:String;
+	var parentId:String;
+	var states:Array<State>;
+	var inapplicableStates:Array<State>;
+}
+
+@:keep
+@:expose
 @:structInit
-class Character extends HierarchicalItem<Character> {
+class Character extends HierarchicalItem {
 	public var states:Array<State>;
 	public var inapplicableStates:Array<State>;
 
-	public inline function new(item:HierarchicalItem<Character>, states:Array<State>, inapplicableStates:Array<State>) {
+	public inline function new(item:HierarchicalItem, states:Array<State>, inapplicableStates:Array<State>) {
 		super("character", item.id, item.hid, item.parentId, item.topLevel, item.children.keys(), item);
 		this.states = states;
 		this.inapplicableStates = inapplicableStates;
@@ -52,6 +61,29 @@ class Character extends HierarchicalItem<Character> {
 			},
 			states: states,
 			mediaObjects: statesData.flatMap(data -> data.mediaObjects).concat([]),
+		};
+	}
+
+	public static function create(characters:DynamicAccess<Character>, data:CharacterCreationData):Character {
+		var nextId = characters.keys().length;
+		while (characters["myd-" + nextId] != null) {
+			nextId++;
+		}
+		final newCharacterId = "myd-" + nextId;
+		return {
+			item: {
+				type: "character",
+				id: newCharacterId,
+				hid: newCharacterId,
+				parentId: data.parentId,
+				topLevel: data.parentId == null,
+				childrenIds: [],
+				data: {
+					name: data.name
+				},
+			},
+			states: data.states,
+			inapplicableStates: data.inapplicableStates,
 		};
 	}
 }

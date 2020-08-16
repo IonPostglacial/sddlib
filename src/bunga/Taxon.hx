@@ -8,12 +8,14 @@ import haxe.DynamicAccess;
 	public var mediaObjects:Array<sdd.MediaObject>;
 }
 
+@:keep
+@:expose
 @:structInit
-class Taxon extends HierarchicalItem<Taxon> {
+class Taxon extends HierarchicalItem {
 	public var descriptions:Array<Description>;
 	public var bookInfoByIds:DynamicAccess<BookInfo> = {};
 
-	public inline function new(item:HierarchicalItem<Taxon>, descriptions, ?bookInfoByIds) {
+	public inline function new(item:HierarchicalItem, descriptions, ?bookInfoByIds) {
 		super("taxon", item.id, item.hid, item.parentId, item.topLevel, item.children.keys(), item);
 		this.descriptions = descriptions;
 		if (bookInfoByIds != null) {
@@ -51,8 +53,8 @@ class Taxon extends HierarchicalItem<Taxon> {
 			parentId: taxon.parentId,
 			representation: taxon.toRepresentation(extraFields),
 			childrenIds: taxon.children.keys(),
-			categoricals: taxon.descriptions.map(function (d):sdd.CategoricalRef return {
-				ref: d.descriptor.id, 
+			categoricals: taxon.descriptions.map(function(d):sdd.CategoricalRef return {
+				ref: d.descriptor.id,
 				stateRefs: d.states.map(s -> new sdd.StateRef(s.id))
 			}),
 		};

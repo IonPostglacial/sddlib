@@ -5,16 +5,20 @@ import haxe.DynamicAccess;
 @:keep
 @:expose
 @:structInit
-class Dataset extends DetailData {
-	public var items:DynamicAccess<Taxon>;
+class Dataset {
+	public var id:String = "0";
+	public var taxons:DynamicAccess<Taxon>;
 	public var descriptors:DynamicAccess<Character>;
 	public var books:Array<Book>;
+	public var extraFields:Array<Field>;
+	public var dictionaryEntries:DynamicAccess<Any>;
 
-	public function new(items, descriptors, ?books) {
-		super();
-		this.items = items;
+	public function new(id, taxons, descriptors, ?books, ?extraFields, ?dictionaryEntries) {
+		this.taxons = taxons;
 		this.descriptors = descriptors;
-		this.books = if(books != null) books else [for (book in Book.standard) book];
+		this.books = if (books != null) books else [for (book in Book.standard) book];
+		this.extraFields = if (extraFields != null) extraFields else [];
+		this.dictionaryEntries = if (dictionaryEntries != null) dictionaryEntries else {};
 	}
 
 	static function extractStatesById(sddContent:sdd.Dataset, photosByRef:DynamicAccess<String>) {
@@ -60,23 +64,25 @@ class Dataset extends DetailData {
 		final descriptors = extractDescriptorsById(dataset, statesById, photosByRef);
 
 		for (descriptor in descriptors) {
-			descriptor.hydrateChildren(descriptors);
+			descriptor.hydrateChildren(cast descriptors);
 		}
 
-		final items = extractItemsById(dataset, descriptors, extraFields, statesById, photosByRef);
+		final taxons = extractItemsById(dataset, descriptors, extraFields, statesById, photosByRef);
 
-		for (item in items) {
-			item.hydrateChildren(items);
+		for (item in taxons) {
+			item.hydrateChildren(cast taxons);
 		}
 
-		return {items: items, descriptors: descriptors};
+		return {id: "0", taxons: taxons, descriptors: descriptors};
 	}
 
 	public static function toSdd(dataset:Dataset, extraFields:Array<Field>):sdd.Dataset {
-		var taxons = new Array<sdd.Taxon>(), characters = new Array<sdd.Character>();
-		var states = new Array<sdd.State>(), mediaObjects = new Array<sdd.MediaObject>();
-		
-		for (taxon in dataset.items) {
+		var taxons = new Array<sdd.Taxon>(),
+			characters = new Array<sdd.Character>();
+		var states = new Array<sdd.State>(),
+			mediaObjects = new Array<sdd.MediaObject>();
+
+		for (taxon in dataset.taxons) {
 			final sddData = Taxon.toSdd(taxon, extraFields, mediaObjects);
 			taxons.push(sddData.taxon);
 			mediaObjects = mediaObjects.concat(sddData.mediaObjects);

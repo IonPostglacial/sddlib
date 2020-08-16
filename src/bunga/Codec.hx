@@ -2,16 +2,17 @@ package bunga;
 
 import haxe.DynamicAccess;
 
-class CodedHierarchicalItem<T:Item> extends Item {
+class CodedHierarchicalItem extends Item {
 	public var type:String;
 	public var hid:String;
 	public var parentId:Null<String>;
 	public var topLevel:Bool;
 	public var children:Array<String> = [];
 
-	public function new(item:HierarchicalItem<T>) {
-		super(item.id, new DetailData(item.name, item.author, item.nameCN, item.fasc, item.page, item.detail, item.photos, item.name2, item.vernacularName,
-			item.vernacularName2, item.meaning, item.noHerbier, item.website, item.herbariumPicture, item.extra));
+	public function new(item:HierarchicalItem) {
+		super(item.id,
+			new DetailData(item.name, item.author, item.nameCN, item.fasc, item.page, item.detail, item.photos, item.name2, item.vernacularName,
+				item.vernacularName2, item.meaning, item.noHerbier, item.website, item.herbariumPicture, item.extra));
 		this.type = item.type;
 		this.hid = item.hid;
 		this.parentId = item.parentId;
@@ -37,7 +38,7 @@ class CodedDescription {
 	}
 }
 
-class CodedTaxon extends CodedHierarchicalItem<Taxon> {
+class CodedTaxon extends CodedHierarchicalItem {
 	public var descriptions:Array<CodedDescription>;
 	public var bookInfoByIds:DynamicAccess<BookInfo> = {};
 
@@ -48,7 +49,7 @@ class CodedTaxon extends CodedHierarchicalItem<Taxon> {
 	}
 }
 
-class CodedCharacter extends CodedHierarchicalItem<Character> {
+class CodedCharacter extends CodedHierarchicalItem {
 	public var states:Array<String>;
 	public var inapplicableStatesIds:Array<String>;
 	public var inapplicableStates:Null<Array<State>>; // Only here to fix an oversight in the JS version
@@ -62,9 +63,13 @@ class CodedCharacter extends CodedHierarchicalItem<Character> {
 
 @:structInit
 class CodedDataset {
+	public var id:String;
 	public var states:Array<State>;
 	public var taxons:Array<CodedTaxon>;
 	public var descriptors:Array<CodedCharacter>;
+	public var books:Array<Book>;
+	public var extraFields:Array<Field>;
+	public var dictionaryEntries:DynamicAccess<Any>;
 
 	public static function getAllStates(dataset:Dataset):Array<State> {
 		var states = [];
@@ -75,17 +80,21 @@ class CodedDataset {
 	}
 
 	public function new(dataset:Dataset) {
-		taxons = [for (taxon in dataset.items) new CodedTaxon(taxon)];
+		id = dataset.id;
+		taxons = [for (taxon in dataset.taxons) new CodedTaxon(taxon)];
 		descriptors = [for (character in dataset.descriptors) new CodedCharacter(character)];
 		states = getAllStates(dataset);
+		books = dataset.books;
+		extraFields = dataset.extraFields;
+		dictionaryEntries = dataset.dictionaryEntries;
 	}
 }
 
 @:keep
 @:expose
 class Codec {
-	public static function decodeHierarchicalItem<T:Item>(item:CodedHierarchicalItem<T>):HierarchicalItem<T> {
-		var item:HierarchicalItem<T> = {
+	public static function decodeHierarchicalItem<T:Item>(item:CodedHierarchicalItem):HierarchicalItem {
+		var item:HierarchicalItem = {
 			type: item.type,
 			id: item.id,
 			hid: item.hid,
@@ -102,7 +111,7 @@ class Codec {
 
 		if (bookInfoByIds.keys().length == 0) {
 			for (book in Book.standard) {
-				final info:BookInfo =  {
+				final info:BookInfo = {
 					fasc: if (book.id == "fmc") "" + taxon.fasc else "",
 					page: if (book.id == "fmc") taxon.page else null,
 					detail: ""
@@ -138,7 +147,7 @@ class Codec {
 	public static function decodeDataset(dataset:CodedDataset):Dataset {
 		final states:DynamicAccess<State> = {};
 		final descriptors:DynamicAccess<Character> = {};
-		final items:DynamicAccess<Taxon> = {};
+		final taxons:DynamicAccess<Taxon> = {};
 		final books = [for (book in Book.standard) book];
 
 		for (state in dataset.states)
@@ -146,11 +155,18 @@ class Codec {
 		for (descriptor in dataset.descriptors)
 			descriptors[descriptor.id] = decodeCharacter(descriptor, states);
 		for (taxon in dataset.taxons)
-			items[taxon.id] = decodeTaxon(taxon, descriptors, states, books);
+			taxons[taxon.id] = decodeTaxon(taxon, descriptors, states, books);
 		for (descriptor in descriptors)
-			descriptor.hydrateChildren(descriptors);
-		for (item in items)
-			item.hydrateChildren(items);
-		return {items: items, descriptors: descriptors, books: books};
+			descriptor.hydrateChildren(cast descriptors);
+		for (taxon in taxons)
+			taxon.hydrateChildren(cast taxons);
+		return {
+			id: dataset.id,
+			taxons: taxons,
+			descriptors: descriptors,
+			books: books,
+			extraFields: dataset.extraFields,
+			dictionaryEntries: dataset.dictionaryEntries,
+		};
 	}
 }
